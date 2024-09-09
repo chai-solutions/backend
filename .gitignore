@@ -13,4 +13,4 @@ result
 .idea/
 
 # go build files
-./main
+main
