@@ -1,0 +1,16 @@
+# macOS files
+.DS_Store
+
+# evironment settings
+.env
+.env.production
+
+# Nix files
+.direnv/
+result
+
+# jetbrains directory
+.idea/
+
+# go build files
+./main
