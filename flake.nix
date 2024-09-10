@@ -21,7 +21,7 @@
           version = "0.0.1";
           src = pkgs.nix-gitignore.gitignoreSource [] ./.;
 
-          vendorHash = "sha256-T9AbNTSpgq2TtLnES8Er7QS6TQ52W9jLqv/xArDATtI=";
+          vendorHash = "sha256-sIkfsjg/Sxo58gOFzpEQwv2kS9NFy094hOpP0xl9xYQ=";
 
           meta = with pkgs.lib; {
             description = "Chai Solutions backend";

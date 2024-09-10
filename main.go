@@ -26,9 +26,6 @@ func main() {
 
 	log.Info().Str("env", app_env).Send()
 
-	server, err := NewServer(":8080")
-	if err != nil {
-		panic(err)
-	}
+	server := NewApp(":8080")
 	server.Start()
 }
