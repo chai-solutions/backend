@@ -26,6 +26,8 @@ func main() {
 
 	log.Info().Str("env", app_env).Send()
 
-	server := NewApp(":8080")
+	app_port := os.Getenv("APP_PORT")
+
+	server := NewApp(":" + app_port)
 	server.Start()
 }
