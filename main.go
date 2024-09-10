@@ -1,20 +1,12 @@
 package main
 
 import (
-	"fmt"
-	"net/http"
 	"os"
 	"time"
-
-	"github.com/go-chi/chi/v5"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
-
-func helloHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Hello, World!")
-}
 
 func main() {
 	app_env := os.Getenv("APP_ENV")
@@ -32,11 +24,11 @@ func main() {
 		log.Fatal().Msg("APP_ENV is not set")
 	}
 
-	log.Info().Msg("starting...")
 	log.Info().Str("env", app_env).Send()
 
-	r := chi.NewRouter()
-	r.Get("/hello", helloHandler)
-
-	log.Fatal().Err(http.ListenAndServe(":8080", r))
+	server, err := NewServer(":8080")
+	if err != nil {
+		panic(err)
+	}
+	server.Start()
 }
