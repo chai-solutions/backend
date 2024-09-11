@@ -37,6 +37,7 @@
             go
             gotools
             postgresql_16
+            dbmate
           ];
 
           shellHook = ''
