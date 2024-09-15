@@ -2,13 +2,18 @@ package main
 
 import (
 	"context"
+	"encoding/json"
+	"math/rand/v2"
 	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	"chai/middleware"
+
 	"github.com/go-chi/chi/v5"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
@@ -18,12 +23,28 @@ type App struct {
 	s  *http.Server
 }
 
+type helloRes struct {
+	Message string `json:"message"`
+	Number  int    `json:"number"`
+}
+
 func helloHandler(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Goodbye, cruel world!"))
+	number := rand.IntN(69_420_000)
+	_ = number
+
+	_ = json.NewEncoder(w).Encode(helloRes{
+		Message: "Hello, world! The server is alive.",
+		Number:  number,
+	})
 }
 
 func newAPI() *chi.Mux {
 	r := chi.NewRouter()
+
+	r.Use(chiMiddleware.Recoverer)
+	r.Use(middleware.RequestLogger)
+	r.Use(middleware.JSONContentType)
+
 	r.Get("/hello", helloHandler)
 
 	return r
