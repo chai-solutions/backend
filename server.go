@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
@@ -31,13 +30,10 @@ func newAPI() *chi.Mux {
 }
 
 func newDBPool() *pgxpool.Pool {
-	user := os.Getenv("DB_USER")
-	pw := os.Getenv("DB_PASS")
-	host := os.Getenv("DB_HOST")
-	port := os.Getenv("DB_PORT")
-	db_name := os.Getenv("DB_NAME")
-
-	db_url := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", user, pw, host, port, db_name)
+	db_url, found := os.LookupEnv("DATABASE_URL")
+	if !found {
+		log.Fatal().Msg("DATABASE_URL is not defined")
+	}
 
 	pool, err := pgxpool.New(context.Background(), db_url)
 	if err != nil {
@@ -74,7 +70,7 @@ func (a *App) Start() {
 		}
 	}()
 
-	log.Info().Msg("server is ready")
+	log.Info().Msgf("server is listening on %s", a.s.Addr)
 	a.WaitForShutdown()
 }
 

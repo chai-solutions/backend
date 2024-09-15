@@ -9,7 +9,10 @@ import (
 )
 
 func main() {
-	app_env := os.Getenv("APP_ENV")
+	app_env, found := os.LookupEnv("APP_ENV")
+	if !found {
+		log.Fatal().Msg("APP_ENV is not set")
+	}
 
 	if app_env == "prod" {
 		// Do nothing, use defaults
@@ -21,7 +24,7 @@ func main() {
 			Timestamp().
 			Caller().Logger()
 	} else {
-		log.Fatal().Msg("APP_ENV is not set")
+		log.Fatal().Msg("APP_ENV must be either 'dev' or 'prod'")
 	}
 
 	log.Info().Str("env", app_env).Send()
