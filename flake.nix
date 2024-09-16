@@ -1,5 +1,5 @@
 {
-  description = "Chai Solutions backend";
+  description = "Chai Solutions backend daemon";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -17,14 +17,18 @@
 
       perSystem = {pkgs, ...}: {
         packages.default = pkgs.buildGoModule {
-          pname = "chai-solutions-backend";
+          pname = "chaid";
           version = "0.0.1";
           src = pkgs.nix-gitignore.gitignoreSource [] ./.;
 
           vendorHash = "sha256-qVKZ+qHbrtBb/xr/i/FtM8LFPDGy9Soyt83xFKAloz0=";
 
+          postInstall = ''
+            mv $out/bin/cmd $out/bin/chaid
+          '';
+
           meta = with pkgs.lib; {
-            description = "Chai Solutions backend";
+            description = "Chai Solutions backend daemon";
             homepage = "https://chai-solutions.org";
             license = licenses.gpl3Only;
             maintainers = with maintainers; [water-sucks];
@@ -32,7 +36,7 @@
         };
 
         devShells.default = pkgs.mkShell {
-          name = "chai-solutions-backend";
+          name = "chaid";
           buildInputs = with pkgs; [
             go
             gotools
