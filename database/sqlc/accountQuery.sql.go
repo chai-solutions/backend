@@ -22,7 +22,7 @@ type InsertAccountParams struct {
 }
 
 func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) (Account, error) {
-	row := q.db.QueryRowContext(ctx, insertAccount, arg.Owner, arg.Balance, arg.Currency)
+	row := q.db.QueryRow(ctx, insertAccount, arg.Owner, arg.Balance, arg.Currency)
 	var i Account
 	err := row.Scan(
 		&i.ID,
@@ -34,37 +34,21 @@ func (q *Queries) InsertAccount(ctx context.Context, arg InsertAccountParams) (A
 	return i, err
 }
 
-const selectAccountByOwner = `-- name: SelectAccountByOwner :many
+const selectAccountByID = `-- name: SelectAccountByID :one
 SELECT id, owner, balance, currency, created_at
 FROM accounts
-WHERE owner = $1
+WHERE id = $1
 `
 
-func (q *Queries) SelectAccountByOwner(ctx context.Context, owner string) ([]Account, error) {
-	rows, err := q.db.QueryContext(ctx, selectAccountByOwner, owner)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []Account
-	for rows.Next() {
-		var i Account
-		if err := rows.Scan(
-			&i.ID,
-			&i.Owner,
-			&i.Balance,
-			&i.Currency,
-			&i.CreatedAt,
-		); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Close(); err != nil {
-		return nil, err
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) SelectAccountByID(ctx context.Context, id int64) (Account, error) {
+	row := q.db.QueryRow(ctx, selectAccountByID, id)
+	var i Account
+	err := row.Scan(
+		&i.ID,
+		&i.Owner,
+		&i.Balance,
+		&i.Currency,
+		&i.CreatedAt,
+	)
+	return i, err
 }

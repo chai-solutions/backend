@@ -5,13 +5,13 @@
 package sqlc
 
 import (
-	"database/sql"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 type Account struct {
-	ID        int64        `json:"id"`
-	Owner     string       `json:"owner"`
-	Balance   int64        `json:"balance"`
-	Currency  string       `json:"currency"`
-	CreatedAt sql.NullTime `json:"created_at"`
+	ID        int64            `json:"id"`
+	Owner     string           `json:"owner"`
+	Balance   int64            `json:"balance"`
+	Currency  string           `json:"currency"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
 }

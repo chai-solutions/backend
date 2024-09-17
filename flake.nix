@@ -38,6 +38,7 @@
             gotools
             postgresql_16
             dbmate
+            sqlc
           ];
 
           shellHook = ''
