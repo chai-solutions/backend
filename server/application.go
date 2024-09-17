@@ -25,7 +25,7 @@ type App struct {
 	Queries *sqlc.Queries
 }
 
-func NewApp(cfg config.AppConfig, db *pgxpool.Pool) *App {
+func NewApp(cfg config.AppConfig, db *pgxpool.Pool, queries *sqlc.Queries) *App {
 	mux := chi.NewMux()
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
@@ -37,8 +37,6 @@ func NewApp(cfg config.AppConfig, db *pgxpool.Pool) *App {
 		WriteTimeout: 10 * time.Second,
 		IdleTimeout:  15 * time.Second,
 	}
-
-	queries := sqlc.New(db)
 
 	return &App{
 		Config:  cfg,

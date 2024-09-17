@@ -27,9 +27,9 @@ func main() {
 
 	log.Info().Str("env", cfg.Env).Send()
 
-	db := database.NewPool(cfg.DatabaseURL)
+	db, queries := database.NewPool(cfg.DatabaseURL)
 
-	server := server.NewApp(cfg, db)
+	server := server.NewApp(cfg, db, queries)
 	server.RegisterRoutes()
 
 	server.Start()
