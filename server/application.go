@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"chai/config"
+	"chai/database/sqlc"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -17,13 +18,14 @@ import (
 )
 
 type App struct {
-	Config config.AppConfig
-	DB     *pgxpool.Pool
-	Router *chi.Mux
-	Server *http.Server
+	Config  config.AppConfig
+	DB      *pgxpool.Pool
+	Router  *chi.Mux
+	Server  *http.Server
+	Queries *sqlc.Queries
 }
 
-func NewApp(cfg config.AppConfig, db *pgxpool.Pool) *App {
+func NewApp(cfg config.AppConfig, db *pgxpool.Pool, queries *sqlc.Queries) *App {
 	mux := chi.NewMux()
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
@@ -37,10 +39,11 @@ func NewApp(cfg config.AppConfig, db *pgxpool.Pool) *App {
 	}
 
 	return &App{
-		Config: cfg,
-		DB:     db,
-		Router: mux,
-		Server: &s,
+		Config:  cfg,
+		DB:      db,
+		Router:  mux,
+		Server:  &s,
+		Queries: queries,
 	}
 }
 

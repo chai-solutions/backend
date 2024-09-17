@@ -14,4 +14,7 @@ func (a *App) RegisterRoutes() {
 	r.Use(middleware.JSONContentType)
 
 	r.Get("/hello", a.HelloHandler)
+
+	r.Get("/account", a.AccountHandler)
+	r.Post("/account", a.AccountHandler)
 }
