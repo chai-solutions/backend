@@ -17,3 +17,6 @@ main
 
 # database stuffs
 .postgres/
+
+# delve debugger files
+__debug*
