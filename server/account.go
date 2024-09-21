@@ -35,12 +35,13 @@ func (a *App) insertAccountHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	_ = json.NewEncoder(w).Encode(
+
+	err = json.NewEncoder(w).Encode(
 		accountRes{
 			Message: "Account created successfully",
 			Data:    newAccount,
 		})
-
+	_ = err
 }
 
 func (a *App) selectAccountHandler(w http.ResponseWriter, r *http.Request) {
@@ -52,7 +53,6 @@ func (a *App) selectAccountHandler(w http.ResponseWriter, r *http.Request) {
 	accountID, err := strconv.ParseInt(accountIDstr, 10, 64)
 	if err != nil {
 		http.Error(w, "Invalid account ID", http.StatusBadRequest)
-
 	}
 
 	account, err := a.Queries.SelectAccountByID(context.Background(), accountID)
@@ -60,10 +60,10 @@ func (a *App) selectAccountHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	_ = json.NewEncoder(w).Encode(
+	err = json.NewEncoder(w).Encode(
 		accountRes{
 			Message: "Account retrieved successfully",
 			Data:    account,
 		})
-
+	_ = err
 }

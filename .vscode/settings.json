@@ -5,7 +5,7 @@
   "go.vetOnSave": "workspace",
   "go.buildTags": "",
   "go.buildFlags": [],
-  "go.lintTool": "golint",
+  "go.lintTool": "golangci-lint",
   "go.lintFlags": [],
   "go.vetFlags": [],
   "go.testOnSave": false,
@@ -15,3 +15,4 @@
   "go.gopath": "",
   "go.inferGopath": true
 }
+

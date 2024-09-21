@@ -40,6 +40,7 @@
           buildInputs = with pkgs; [
             go
             gotools
+            golangci-lint
             postgresql_16
             dbmate
             sqlc

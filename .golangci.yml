@@ -1,0 +1,24 @@
+linters:
+  disable-all: true
+  enable:
+    - errcheck # Detect unchecked errors
+    - gosimple # Suggest code simplifications
+    - ineffassign # Detects unused variable assignments
+    - staticcheck # go vet on steroids
+    - unused # Detect unused constants, variables, functions and types
+
+    - gofmt # Or "gofmt", # Enforce standard formatting
+    - goconst # Detect repeated values that can be made constants
+    - goimports # Ensure standard import formatting/ordering
+    - misspell # Fix spelling errors
+    - revive # General purpose linter
+    - unconvert # Detect unnecessary type conversions
+    - unparam # Detect unused function parameters
+    # - gocyclo # Detect cyclomatic complexity
+
+    - bodyclose # Check whether HTTP response bodies are closed
+    - dupl # Detect duplicate code
+    - errchkjson # some JSON-specific checks
+    - nakedret # Detect naked returns
+    - tparallel # Detects inappropriate use of t.Parallel()
+

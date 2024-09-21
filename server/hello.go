@@ -14,8 +14,9 @@ type helloRes struct {
 func (a *App) HelloHandler(w http.ResponseWriter, _ *http.Request) {
 	number := rand.IntN(69_420_000)
 
-	_ = json.NewEncoder(w).Encode(helloRes{
+	err := json.NewEncoder(w).Encode(helloRes{
 		Message: "Hello, world! The server is alive.",
 		Number:  number,
 	})
+	_ = err
 }

@@ -54,14 +54,10 @@ func (w *customResponseWriter) Header() http.Header {
 func (w *customResponseWriter) WriteHeader(statusCode int) {
 	w.StatusCode = statusCode
 	w.responseWriter.WriteHeader(statusCode)
-
-	return
 }
 
 func (w *customResponseWriter) Done() {
 	if w.StatusCode == 0 {
 		w.StatusCode = http.StatusOK
 	}
-
-	return
 }

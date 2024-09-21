@@ -31,7 +31,7 @@ func GetConfig() AppConfig {
 		log.Fatal().Msg("APP_PORT must be an integer")
 	}
 
-	dbUrl, found := os.LookupEnv("DATABASE_URL")
+	dbURL, found := os.LookupEnv("DATABASE_URL")
 	if !found {
 		log.Fatal().Msg("DATABASE_URL is not defined")
 	}
@@ -39,6 +39,6 @@ func GetConfig() AppConfig {
 	return AppConfig{
 		Env:         env,
 		Port:        port,
-		DatabaseURL: dbUrl,
+		DatabaseURL: dbURL,
 	}
 }
