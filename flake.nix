@@ -35,34 +35,43 @@
           };
         };
 
-        devShells.default = pkgs.mkShell {
-          name = "chaid";
-          buildInputs = with pkgs; [
-            go
-            gotools
-            golangci-lint
-            postgresql_16
-            dbmate
-            sqlc
-          ];
+        devShells = {
+          default = pkgs.mkShell {
+            name = "chaid-shell";
+            buildInputs = with pkgs; [
+              go
+              gotools
+              golangci-lint
+              postgresql_16
+              dbmate
+              sqlc
+            ];
 
-          shellHook = ''
-            root_dir="$(git rev-parse --show-toplevel)"
+            shellHook = ''
+              root_dir="$(git rev-parse --show-toplevel)"
 
-            export PGHOST="$root_dir/.postgres"
-            export PGDATA="$PGHOST/data"
-            export PGDATABASE="chai"
-            export PGLOG="$PGHOST/postgres.log"
+              export PGHOST="$root_dir/.postgres"
+              export PGDATA="$PGHOST/data"
+              export PGDATABASE="chai"
+              export PGLOG="$PGHOST/postgres.log"
 
-            if [ ! -d $PGDATA ]; then
-              mkdir -p $PGDATA
-              initdb -U postgres $PGDATA --auth=trust --no-locale --encoding=UTF8 > /dev/null
+              if [ ! -d $PGDATA ]; then
+                mkdir -p $PGDATA
+                initdb -U postgres $PGDATA --auth=trust --no-locale --encoding=UTF8 > /dev/null
 
-              echo "CREATE USER chai;" | postgres --single -D $PGDATA postgres > /dev/null
-              echo "GRANT ALL ON SCHEMA public TO chai;" | postgres --single -D $PGDATA postgres > /dev/null
-              echo "CREATE DATABASE chai;" | postgres --single -D $PGDATA postgres > /dev/null
-            fi
-          '';
+                echo "CREATE USER chai;" | postgres --single -D $PGDATA postgres > /dev/null
+                echo "GRANT ALL ON SCHEMA public TO chai;" | postgres --single -D $PGDATA postgres > /dev/null
+                echo "CREATE DATABASE chai;" | postgres --single -D $PGDATA postgres > /dev/null
+              fi
+            '';
+          };
+          ci = pkgs.mkShell {
+            name = "chaid-ci-shell";
+            buildInputs = with pkgs; [
+              go
+              golangci-lint
+            ];
+          };
         };
 
         process-compose = {

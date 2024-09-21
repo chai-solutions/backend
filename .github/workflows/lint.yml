@@ -1,0 +1,45 @@
+name: Lint/Test
+on:
+  workflow_dispatch:
+  push:
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: lint
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Use Nix development environment
+        uses: rrbutani/use-nix-shell-action@v1
+        with:
+          devShell: .#ci
+
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          install-mode: none # golangci-lint comes from the Nix shell to ensure reproducibility.
+
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@main
+
+      - name: Use Nix development environment
+        uses: rrbutani/use-nix-shell-action@v1
+        with:
+          devShell: .#ci
+
+      - name: Run tests
+        run: go test ./...
