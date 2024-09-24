@@ -29,6 +29,7 @@ func main() {
 
 	db, queries := database.NewPool(cfg.DatabaseURL)
 
+	database.RunMigrations(cfg.DatabaseURL)
 	server := server.NewApp(cfg, db, queries)
 	server.RegisterRoutes()
 
