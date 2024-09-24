@@ -29,7 +29,7 @@ func NewPool(url string) (*pgxpool.Pool, *sqlc.Queries) {
 func RunMigrations(databaseURL string) {
 	u, err := url.Parse(databaseURL)
 	if err != nil {
-		log.Fatal().Err(err).Msg("Invalid database URL")
+		log.Fatal().Err(err).Send()
 	}
 
 	db := dbmate.New(u)
@@ -39,6 +39,6 @@ func RunMigrations(databaseURL string) {
 
 	err = db.CreateAndMigrate()
 	if err != nil {
-		log.Fatal().Err(err).Msg("Error migrating")
+		log.Fatal().Err(err).Send()
 	}
 }
