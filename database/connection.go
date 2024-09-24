@@ -7,6 +7,7 @@ import (
 	"net/url"
 
 	"github.com/amacneil/dbmate/v2/pkg/dbmate"
+	// Import the postgres driver for dbmate
 	_ "github.com/amacneil/dbmate/v2/pkg/driver/postgres"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
