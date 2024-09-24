@@ -21,7 +21,7 @@
           version = "0.0.1";
           src = pkgs.nix-gitignore.gitignoreSource [] ./.;
 
-          vendorHash = "sha256-qVKZ+qHbrtBb/xr/i/FtM8LFPDGy9Soyt83xFKAloz0=";
+          vendorHash = "sha256-s8tLJ0ynVOYKYmlCXnttd7kpRugxYFTwczAH9Fr4dk0";
 
           postInstall = ''
             mv $out/bin/cmd $out/bin/chaid
