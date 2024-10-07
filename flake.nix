@@ -60,8 +60,7 @@
                 initdb -U postgres $PGDATA --auth=trust --no-locale --encoding=UTF8 > /dev/null
 
                 echo "CREATE USER chai;" | postgres --single -D $PGDATA postgres > /dev/null
-                echo "GRANT ALL ON SCHEMA public TO chai;" | postgres --single -D $PGDATA postgres > /dev/null
-                echo "CREATE DATABASE chai;" | postgres --single -D $PGDATA postgres > /dev/null
+                echo "CREATE DATABASE chai OWNER chai;" | postgres --single -D $PGDATA postgres > /dev/null
               fi
             '';
           };
