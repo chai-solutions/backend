@@ -10,9 +10,16 @@ import (
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	err := godotenv.Load()
+	if err != nil {
+		log.Warn().Err(err).Send()
+	}
+
 	cfg := config.GetConfig()
 
 	if cfg.Env == "dev" {

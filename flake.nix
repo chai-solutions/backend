@@ -21,7 +21,7 @@
           version = "0.0.1";
           src = pkgs.nix-gitignore.gitignoreSource [] ./.;
 
-          vendorHash = "sha256-s8tLJ0ynVOYKYmlCXnttd7kpRugxYFTwczAH9Fr4dk0";
+          vendorHash = "sha256-IWoL6Xt1Z+zYgK7Hq90VG26/J5oXQsxdNclvxUnq2yI=";
 
           postInstall = ''
             mv $out/bin/cmd $out/bin/chaid
@@ -60,8 +60,7 @@
                 initdb -U postgres $PGDATA --auth=trust --no-locale --encoding=UTF8 > /dev/null
 
                 echo "CREATE USER chai;" | postgres --single -D $PGDATA postgres > /dev/null
-                echo "GRANT ALL ON SCHEMA public TO chai;" | postgres --single -D $PGDATA postgres > /dev/null
-                echo "CREATE DATABASE chai;" | postgres --single -D $PGDATA postgres > /dev/null
+                echo "CREATE DATABASE chai OWNER chai;" | postgres --single -D $PGDATA postgres > /dev/null
               fi
             '';
           };
