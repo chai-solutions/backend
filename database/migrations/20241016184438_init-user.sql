@@ -11,7 +11,7 @@ CREATE TABLE users (
 
 CREATE TABLE sessions (
   id SERIAL,
-  user_id INT,
+  user_id INT NOT NULL,
   token VARCHAR(255) NOT NULL UNIQUE,
   created_at TIMESTAMP DEFAULT NOW(),
   expires_at TIMESTAMP NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE sessions (
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
-DROP TABLE accounts;
+DROP TABLE IF EXISTS accounts;
 
 -- migrate:down
 DROP TABLE sessions;

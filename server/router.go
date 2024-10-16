@@ -14,6 +14,8 @@ func (a *App) RegisterRoutes() {
 	r.Use(middleware.JSONContentType)
 
 	r.Get("/hello", a.HelloHandler)
-
 	r.Post("/users", a.CreateUserHandler)
+
+	r.Post("/login", a.LoginHandler)
+	// TODO: add user auth middleware
 }
