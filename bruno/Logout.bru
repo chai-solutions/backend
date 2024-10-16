@@ -1,0 +1,21 @@
+meta {
+  name: Logout
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{url}}/logout
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+script:post-response {
+  if (res.status == 204) {
+    bru.setEnvVar("token", "dummy");
+  }
+}

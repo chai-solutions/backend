@@ -35,27 +35,47 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (C
 	return i, err
 }
 
+const deleteSession = `-- name: DeleteSession :exec
+DELETE FROM sessions
+WHERE token = $1
+`
+
+func (q *Queries) DeleteSession(ctx context.Context, token string) error {
+	_, err := q.db.Exec(ctx, deleteSession, token)
+	return err
+}
+
 const getUserFromSessionContext = `-- name: GetUserFromSessionContext :many
-SELECT u.id, u.created_at, u.name, u.email, u.password FROM sessions s
+SELECT u.id, u.created_at, u.name, u.email, u.password, s.token FROM sessions s
 INNER JOIN users u ON s.user_id = u.id
 WHERE token = $1
 `
 
-func (q *Queries) GetUserFromSessionContext(ctx context.Context, token string) ([]User, error) {
+type GetUserFromSessionContextRow struct {
+	ID        int32            `json:"id"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	Name      string           `json:"name"`
+	Email     string           `json:"email"`
+	Password  string           `json:"password"`
+	Token     string           `json:"token"`
+}
+
+func (q *Queries) GetUserFromSessionContext(ctx context.Context, token string) ([]GetUserFromSessionContextRow, error) {
 	rows, err := q.db.Query(ctx, getUserFromSessionContext, token)
 	if err != nil {
 		return nil, err
 	}
 	defer rows.Close()
-	var items []User
+	var items []GetUserFromSessionContextRow
 	for rows.Next() {
-		var i User
+		var i GetUserFromSessionContextRow
 		if err := rows.Scan(
 			&i.ID,
 			&i.CreatedAt,
 			&i.Name,
 			&i.Email,
 			&i.Password,
+			&i.Token,
 		); err != nil {
 			return nil, err
 		}

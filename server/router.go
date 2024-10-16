@@ -21,6 +21,8 @@ func (a *App) RegisterRoutes() {
 
 	r.Group(func(r chi.Router) {
 		r.Use(middleware.APIAuthorization(a.Queries))
+
 		r.Get("/users/@me", a.UserInfoHandler)
+		r.Delete("/logout", a.LogoutHandler)
 	})
 }

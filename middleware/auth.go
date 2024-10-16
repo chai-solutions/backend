@@ -10,10 +10,18 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func MustGetUserFromContext(ctx context.Context) sqlc.User {
-	user, ok := ctx.Value(userCtxKey).(sqlc.User)
+func MustGetUserFromContext(ctx context.Context) sqlc.GetUserFromSessionContextRow {
+	user, ok := ctx.Value(userCtxKey).(sqlc.GetUserFromSessionContextRow)
 	if !ok {
 		panic("user not present in context")
+	}
+	return user
+}
+
+func MustGetSessionFromContext(ctx context.Context) sqlc.User {
+	user, ok := ctx.Value(userCtxKey).(sqlc.User)
+	if !ok {
+		panic("session not present in context")
 	}
 	return user
 }

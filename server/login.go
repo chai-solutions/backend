@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"chai/database/sqlc"
+	"chai/middleware"
 
 	"github.com/jackc/pgx/v5/pgtype"
 	"github.com/rs/zerolog/log"
@@ -94,6 +95,19 @@ func (a *App) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		Authorization: token,
 	})
 	_ = err
+}
+
+func (a *App) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.MustGetUserFromContext(r.Context())
+
+	err := a.Queries.DeleteSession(context.Background(), user.Token)
+	if err != nil {
+		log.Warn().Err(err).Send()
+		http.Error(w, "session deletion error: "+err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func generateSessionToken() (string, error) {
