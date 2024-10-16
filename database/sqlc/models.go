@@ -8,10 +8,18 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type Account struct {
-	ID        int64            `json:"id"`
-	Owner     string           `json:"owner"`
-	Balance   int64            `json:"balance"`
-	Currency  string           `json:"currency"`
+type Session struct {
+	ID        int32            `json:"id"`
+	UserID    int32            `json:"user_id"`
+	Token     string           `json:"token"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
+	ExpiresAt pgtype.Timestamp `json:"expires_at"`
+}
+
+type User struct {
+	ID        int32            `json:"id"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	Name      string           `json:"name"`
+	Email     string           `json:"email"`
+	Password  string           `json:"password"`
 }

@@ -5,12 +5,15 @@ meta {
 }
 
 post {
-  url: {{url}}/account?name=Ramadou&currency=USD
-  body: none
+  url: {{url}}/users
+  body: json
   auth: none
 }
 
-params:query {
-  name: Ramadou
-  currency: USD
+body:json {
+  {
+    "name": "Sanjay Ramaswamy",
+    "email": "sanjay@ramaswamy.net",
+    "password": "ramaswamy123"
+  }
 }

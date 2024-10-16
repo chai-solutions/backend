@@ -1,0 +1,24 @@
+meta {
+  name: Login
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{url}}/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "sanjay@ramaswamy.net",
+    "password": "ramaswamy123"
+  }
+}
+
+script:post-response {
+  if (res.status == 200) {
+    bru.setEnvVar("token", res.getBody().authorization);
+  }
+}
