@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"chai/database/sqlc"
+	"chai/middleware"
 
 	"golang.org/x/crypto/bcrypt"
 )
@@ -54,5 +55,12 @@ func (a *App) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = json.NewEncoder(w).Encode(createdUser)
+	_ = err
+}
+
+func (a *App) UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.MustGetUserFromContext(r.Context())
+
+	err := json.NewEncoder(w).Encode(user)
 	_ = err
 }

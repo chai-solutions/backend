@@ -3,6 +3,7 @@ package server
 import (
 	"chai/middleware"
 
+	"github.com/go-chi/chi/v5"
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 )
 
@@ -17,5 +18,9 @@ func (a *App) RegisterRoutes() {
 	r.Post("/users", a.CreateUserHandler)
 
 	r.Post("/login", a.LoginHandler)
-	// TODO: add user auth middleware
+
+	r.Group(func(r chi.Router) {
+		r.Use(middleware.APIAuthorization(a.Queries))
+		r.Get("/users/@me", a.UserInfoHandler)
+	})
 }

@@ -10,7 +10,7 @@ import (
 
 type Session struct {
 	ID        int32            `json:"id"`
-	UserID    pgtype.Int4      `json:"user_id"`
+	UserID    int32            `json:"user_id"`
 	Token     string           `json:"token"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
 	ExpiresAt pgtype.Timestamp `json:"expires_at"`

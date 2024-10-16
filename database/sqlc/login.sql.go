@@ -18,14 +18,14 @@ RETURNING user_id, token
 `
 
 type CreateSessionParams struct {
-	UserID     pgtype.Int4      `json:"user_id"`
+	UserID     int32            `json:"user_id"`
 	Token      string           `json:"token"`
 	ExpiryTime pgtype.Timestamp `json:"expiry_time"`
 }
 
 type CreateSessionRow struct {
-	UserID pgtype.Int4 `json:"user_id"`
-	Token  string      `json:"token"`
+	UserID int32  `json:"user_id"`
+	Token  string `json:"token"`
 }
 
 func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (CreateSessionRow, error) {
@@ -33,6 +33,38 @@ func (q *Queries) CreateSession(ctx context.Context, arg CreateSessionParams) (C
 	var i CreateSessionRow
 	err := row.Scan(&i.UserID, &i.Token)
 	return i, err
+}
+
+const getUserFromSessionContext = `-- name: GetUserFromSessionContext :many
+SELECT u.id, u.created_at, u.name, u.email, u.password FROM sessions s
+INNER JOIN users u ON s.user_id = u.id
+WHERE token = $1
+`
+
+func (q *Queries) GetUserFromSessionContext(ctx context.Context, token string) ([]User, error) {
+	rows, err := q.db.Query(ctx, getUserFromSessionContext, token)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []User
+	for rows.Next() {
+		var i User
+		if err := rows.Scan(
+			&i.ID,
+			&i.CreatedAt,
+			&i.Name,
+			&i.Email,
+			&i.Password,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const selectAccountByEmail = `-- name: SelectAccountByEmail :many

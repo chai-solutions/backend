@@ -76,7 +76,7 @@ func (a *App) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Expire 30 days from now.
 	expiryDate := time.Now().Add(24 * time.Hour * 30)
 	_, err = a.Queries.CreateSession(context.Background(), sqlc.CreateSessionParams{
-		UserID: pgtype.Int4{Int32: user.ID, Valid: true},
+		UserID: user.ID,
 		Token:  token,
 		ExpiryTime: pgtype.Timestamp{
 			Time:  expiryDate,
