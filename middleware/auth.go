@@ -18,14 +18,6 @@ func MustGetUserFromContext(ctx context.Context) sqlc.GetUserFromSessionContextR
 	return user
 }
 
-func MustGetSessionFromContext(ctx context.Context) sqlc.User {
-	user, ok := ctx.Value(userCtxKey).(sqlc.User)
-	if !ok {
-		panic("session not present in context")
-	}
-	return user
-}
-
 func APIAuthorization(q *sqlc.Queries) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
