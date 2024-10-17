@@ -1,15 +1,21 @@
 meta {
   name: Create Flight Plan
   type: http
-  seq: 7
+  seq: 9
 }
 
 post {
   url: {{url}}/flight_plan
-  body: none
+  body: json
   auth: none
 }
 
 headers {
   Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "flight_number" : "WN662"
+  }
 }

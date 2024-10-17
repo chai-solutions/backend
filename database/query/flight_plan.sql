@@ -1,7 +1,15 @@
--- name: CreateFlightPlan :many
-INSERT INTO flight_plans (users)
-VALUES (@users)
-RETURNING *;
+-- name: CreateFlightPlan :one
+WITH new_flight_plan AS (
+    INSERT INTO flight_plans (users)
+    VALUES ($1)
+    RETURNING id
+)
+INSERT INTO flight_plan_flights (flight_plan, flight)
+SELECT new_flight_plan.id, f.id
+FROM flights AS f, new_flight_plan
+WHERE f.flight_number = $2
+RETURNING flight_plan, flight
+;
 
 -- name: GetFlightPlans :many
 SELECT 

@@ -11,30 +11,34 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createFlightPlan = `-- name: CreateFlightPlan :many
-INSERT INTO flight_plans (users)
-VALUES ($1)
-RETURNING id, users
+const createFlightPlan = `-- name: CreateFlightPlan :one
+WITH new_flight_plan AS (
+    INSERT INTO flight_plans (users)
+    VALUES ($1)
+    RETURNING id
+)
+INSERT INTO flight_plan_flights (flight_plan, flight)
+SELECT new_flight_plan.id, f.id
+FROM flights AS f, new_flight_plan
+WHERE f.flight_number = $2
+RETURNING flight_plan, flight
 `
 
-func (q *Queries) CreateFlightPlan(ctx context.Context, users int32) ([]FlightPlan, error) {
-	rows, err := q.db.Query(ctx, createFlightPlan, users)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []FlightPlan
-	for rows.Next() {
-		var i FlightPlan
-		if err := rows.Scan(&i.ID, &i.Users); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+type CreateFlightPlanParams struct {
+	Users        int32  `json:"users"`
+	FlightNumber string `json:"flight_number"`
+}
+
+type CreateFlightPlanRow struct {
+	FlightPlan int32 `json:"flight_plan"`
+	Flight     int32 `json:"flight"`
+}
+
+func (q *Queries) CreateFlightPlan(ctx context.Context, arg CreateFlightPlanParams) (CreateFlightPlanRow, error) {
+	row := q.db.QueryRow(ctx, createFlightPlan, arg.Users, arg.FlightNumber)
+	var i CreateFlightPlanRow
+	err := row.Scan(&i.FlightPlan, &i.Flight)
+	return i, err
 }
 
 const getFlightPlan = `-- name: GetFlightPlan :one

@@ -1,21 +1,34 @@
 package server
 
 import (
+	"chai/database/sqlc"
 	"chai/middleware"
 	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"chai/database/sqlc"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
 )
 
-func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
-	user := middleware.MustGetUserFromContext(r.Context())
+type createFlightPlanBody struct {
+	FlightNumber string `json:"flight_number"`
+}
 
-	flightPlan, err := a.Queries.CreateFlightPlan(context.Background(), user.ID)
+func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
+	var body createFlightPlanBody
+	var params sqlc.CreateFlightPlanParams
+	err := json.NewDecoder(r.Body).Decode(&body)
+	if err != nil {
+		http.Error(w, "malformed JSON", http.StatusBadRequest)
+		return
+	}
+	user := middleware.MustGetUserFromContext(r.Context())
+	params.Users = user.ID
+	params.FlightNumber = body.FlightNumber
+
+	flightPlan, err := a.Queries.CreateFlightPlan(context.Background(), params)
 	if err != nil {
 		log.Error().AnErr("CreateFlightPlan", err).Msg("Failed to create flight plan")
 		http.Error(w, "Failed to create flight plan", http.StatusInternalServerError)

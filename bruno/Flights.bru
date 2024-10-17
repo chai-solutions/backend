@@ -1,11 +1,20 @@
 meta {
   name: Flights
   type: http
-  seq: 8
+  seq: 7
 }
 
 get {
-  url: {{url}}/flights
+  url: {{url}}/flights?arrival_airport=LAS&departure_airport=PHX
   body: none
   auth: none
+}
+
+params:query {
+  arrival_airport: LAS
+  departure_airport: PHX
+}
+
+headers {
+  Authorization: Bearer {{token}}
 }

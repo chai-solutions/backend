@@ -5,9 +5,13 @@ meta {
 }
 
 get {
-  url: {{url}}/flight_plans
+  url: {{url}}/flight_plans?id=1
   body: none
   auth: none
+}
+
+params:query {
+  id: 1
 }
 
 headers {
