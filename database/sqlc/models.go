@@ -32,7 +32,6 @@ type Flight struct {
 	SchedArrTime  pgtype.Timestamp `json:"sched_arr_time"`
 	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
 	ActualArrTime pgtype.Timestamp `json:"actual_arr_time"`
-	DelayStatus   interface{}      `json:"delay_status"`
 }
 
 type FlightPlan struct {

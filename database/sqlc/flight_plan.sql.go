@@ -10,8 +10,8 @@ import (
 )
 
 const createFlightPlan = `-- name: CreateFlightPlan :many
-INSERT INTO flight_plans (id, users)
-VALUES (DEFAULT, $1)
+INSERT INTO flight_plans (users)
+VALUES ($1)
 RETURNING id, users
 `
 
