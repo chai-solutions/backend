@@ -30,6 +30,7 @@ func (a *App) RegisterRoutes() {
 		r.Post("/flight_plan", a.CreateFlightPlanHandler)
 
 		r.Get("/flights", a.FlightsHandler)
+		r.Get("/flights/{id}", a.FlightHandler)
 	})
 
 }
