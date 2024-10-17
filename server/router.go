@@ -24,7 +24,10 @@ func (a *App) RegisterRoutes() {
 
 		r.Get("/users/@me", a.UserInfoHandler)
 		r.Delete("/logout", a.LogoutHandler)
+
+		r.Get("/airports", a.AirportsHandler)
+
+		r.Post("/flight_plan", a.CreateFlightPlanHandler)
 	})
 
-	r.Get("/airports", a.AirportsHandler)
 }

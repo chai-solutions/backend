@@ -1,0 +1,19 @@
+meta {
+  name: Create Flight Plan
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{url}}/flight_plan
+  body: none
+  auth: bearer
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+auth:bearer {
+  token: 
+}
