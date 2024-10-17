@@ -1,5 +1,4 @@
 -- migrate:up
-
 DO $$ 
 BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'delay_status_enum') THEN
@@ -33,75 +32,75 @@ CREATE TABLE IF NOT EXISTS sessions (
         ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS "flight_plan" (
-  "id" int PRIMARY KEY,
-  "users" int NOT NULL
+CREATE TABLE IF NOT EXISTS flight_plans (
+  id INT PRIMARY KEY,
+  users INT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "flight_plan_flights" (
-  "id" int PRIMARY KEY,
-  "flight_plan" int NOT NULL,
-  "flight" int NOT NULL
+CREATE TABLE IF NOT EXISTS flight_plan_flights (
+  id INT PRIMARY KEY,
+  flight_plan INT NOT NULL,
+  flight INT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "gates" (
-  "id" int PRIMARY KEY,
-  "name" varchar(20) NOT NULL,
-  "latitude" float8 NOT NULL,
-  "longitude" float8 NOT NULL,
-  "terminal" int NOT NULL
+CREATE TABLE IF NOT EXISTS gates (
+  id INT PRIMARY KEY,
+  name VARCHAR(20) NOT NULL,
+  latitude FLOAT8 NOT NULL,
+  longitude FLOAT8 NOT NULL,
+  terminal INT NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "airport" (
-  "id" serial PRIMARY KEY,
-  "iata" varchar(3) NOT NULL,
-  "name" varchar(50) NOT NULL,
-  "latitude" float8 NOT NULL,
-  "longitude" float8 NOT NULL
+CREATE TABLE IF NOT EXISTS airports (
+  id SERIAL PRIMARY KEY,
+  iata VARCHAR(3) NOT NULL,
+  name VARCHAR(50) NOT NULL,
+  latitude FLOAT8 NOT NULL,
+  longitude FLOAT8 NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "terminal" (
-  "id" serial PRIMARY KEY,
-  "name" varchar(20) NOT NULL,
-  "airport" int NOT NULL,
-  "latitude" float8 NOT NULL,
-  "longitude" float8 NOT NULL
+CREATE TABLE IF NOT EXISTS terminals (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(20) NOT NULL,
+  airport INT NOT NULL,
+  latitude FLOAT8 NOT NULL,
+  longitude FLOAT8 NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "flight" (
-  "id" serial PRIMARY KEY,
-  "flight_number" varchar NOT NULL,
-  "airline" int NOT NULL,
-  "dep_airport" int NOT NULL,
-  "arr_airport" int NOT NULL,
-  "sched_dep_time" timestamp NOT NULL,
-  "sched_arr_time" timestamp NOT NULL,
-  "actual_dep_time" timestamp NOT NULL,
-  "actual_arr_time" timestamp NOT NULL,
-  "delay_status" delay_status_enum NOT NULL
+CREATE TABLE IF NOT EXISTS flights (
+  id SERIAL PRIMARY KEY,
+  flight_number VARCHAR NOT NULL,
+  airline INT NOT NULL,
+  dep_airport INT NOT NULL,
+  arr_airport INT NOT NULL,
+  sched_dep_time TIMESTAMP NOT NULL,
+  sched_arr_time TIMESTAMP NOT NULL,
+  actual_dep_time TIMESTAMP NOT NULL,
+  actual_arr_time TIMESTAMP NOT NULL,
+  delay_status delay_status_enum NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS "airline" (
-  "id" serial PRIMARY KEY,
-  "name" varchar(30) NOT NULL,
-  "iata" varchar(5) NOT NULL
+CREATE TABLE IF NOT EXISTS airlines (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR(30) NOT NULL,
+  iata VARCHAR(5) NOT NULL
 );
 
-ALTER TABLE "flight_plan" ADD FOREIGN KEY ("users") REFERENCES "users" ("id");
+ALTER TABLE flight_plans ADD FOREIGN KEY (users) REFERENCES users (id);
 
-ALTER TABLE "flight_plan_flights" ADD FOREIGN KEY ("flight_plan") REFERENCES "flight_plan" ("id");
+ALTER TABLE flight_plan_flights ADD FOREIGN KEY (flight_plan) REFERENCES flight_plans (id);
 
-ALTER TABLE "flight_plan_flights" ADD FOREIGN KEY ("flight") REFERENCES "flight" ("id");
+ALTER TABLE flight_plan_flights ADD FOREIGN KEY (flight) REFERENCES flights (id);
 
-ALTER TABLE "gates" ADD FOREIGN KEY ("terminal") REFERENCES "terminal" ("id");
+ALTER TABLE gates ADD FOREIGN KEY (terminal) REFERENCES terminals (id);
 
-ALTER TABLE "terminal" ADD FOREIGN KEY ("airport") REFERENCES "airport" ("id");
+ALTER TABLE terminals ADD FOREIGN KEY (airport) REFERENCES airports (id);
 
-ALTER TABLE "flight" ADD FOREIGN KEY ("airline") REFERENCES "airline" ("id");
+ALTER TABLE flights ADD FOREIGN KEY (airline) REFERENCES airlines (id);
 
-ALTER TABLE "flight" ADD FOREIGN KEY ("dep_airport") REFERENCES "airport" ("id");
+ALTER TABLE flights ADD FOREIGN KEY (dep_airport) REFERENCES airports (id);
 
-ALTER TABLE "flight" ADD FOREIGN KEY ("arr_airport") REFERENCES "airport" ("id");
+ALTER TABLE flights ADD FOREIGN KEY (arr_airport) REFERENCES airports (id);
 
 -- migrate:down
 DROP TABLE IF EXISTS "flight_plan" CASCADE;

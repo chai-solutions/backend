@@ -8,12 +8,66 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type Airline struct {
+	ID   int32  `json:"id"`
+	Name string `json:"name"`
+	Iata string `json:"iata"`
+}
+
+type Airport struct {
+	ID        int32   `json:"id"`
+	Iata      string  `json:"iata"`
+	Name      string  `json:"name"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+}
+
+type Flight struct {
+	ID            int32            `json:"id"`
+	FlightNumber  string           `json:"flight_number"`
+	Airline       int32            `json:"airline"`
+	DepAirport    int32            `json:"dep_airport"`
+	ArrAirport    int32            `json:"arr_airport"`
+	SchedDepTime  pgtype.Timestamp `json:"sched_dep_time"`
+	SchedArrTime  pgtype.Timestamp `json:"sched_arr_time"`
+	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
+	ActualArrTime pgtype.Timestamp `json:"actual_arr_time"`
+	DelayStatus   interface{}      `json:"delay_status"`
+}
+
+type FlightPlan struct {
+	ID    int32 `json:"id"`
+	Users int32 `json:"users"`
+}
+
+type FlightPlanFlight struct {
+	ID         int32 `json:"id"`
+	FlightPlan int32 `json:"flight_plan"`
+	Flight     int32 `json:"flight"`
+}
+
+type Gate struct {
+	ID        int32   `json:"id"`
+	Name      string  `json:"name"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
+	Terminal  int32   `json:"terminal"`
+}
+
 type Session struct {
 	ID        int32            `json:"id"`
 	UserID    int32            `json:"user_id"`
 	Token     string           `json:"token"`
 	CreatedAt pgtype.Timestamp `json:"created_at"`
 	ExpiresAt pgtype.Timestamp `json:"expires_at"`
+}
+
+type Terminal struct {
+	ID        int32   `json:"id"`
+	Name      string  `json:"name"`
+	Airport   int32   `json:"airport"`
+	Latitude  float64 `json:"latitude"`
+	Longitude float64 `json:"longitude"`
 }
 
 type User struct {
