@@ -28,6 +28,8 @@ func (a *App) RegisterRoutes() {
 		r.Get("/airports", a.AirportsHandler)
 
 		r.Post("/flight_plan", a.CreateFlightPlanHandler)
+		r.Get("/flight_plans", a.GetFlightPlansHandler)
+		r.Get("/flight_plans/{id}", a.GetFlightPlansHandler)
 
 		r.Get("/flights", a.FlightsHandler)
 		r.Get("/flights/{id}", a.FlightHandler)

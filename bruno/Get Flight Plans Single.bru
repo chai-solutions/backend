@@ -1,0 +1,15 @@
+meta {
+  name: Get Flight Plans Single
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{url}}/flight_plans
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
