@@ -1,0 +1,21 @@
+meta {
+  name: Create Flight Plan
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{url}}/flight_plans
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "flight_number" : "F9611"
+  }
+}

@@ -1,0 +1,20 @@
+meta {
+  name: Flights
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{url}}/flights?departure_airport=LAX&arrival_airport=DTW
+  body: none
+  auth: none
+}
+
+params:query {
+  departure_airport: LAX
+  arrival_airport: DTW
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
