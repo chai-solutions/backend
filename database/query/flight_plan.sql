@@ -63,3 +63,13 @@ JOIN airports AS arrival_airport
 ON f.arr_airport = arrival_airport.id
 WHERE fp.users = @users AND fp.id = @id
 ;
+
+-- name: DeleteFlightPlan :many
+DELETE FROM flight_plans
+WHERE id = @id
+RETURNING *;
+
+-- name: DeleteFlightPlanStep :one
+DELETE FROM flight_plan_flights
+WHERE id = @id
+RETURNING *;

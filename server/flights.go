@@ -31,13 +31,13 @@ func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
-	flight_number := chi.URLParam(r, "flight_number")
-	if flight_number == "" {
+	flightNumber := chi.URLParam(r, "flightNumber")
+	if flightNumber == "" {
 		http.Error(w, "Invalid Flight Number", http.StatusBadRequest)
 		return
 	}
 
-	flight, err := a.Queries.GetFlight(context.Background(), flight_number)
+	flight, err := a.Queries.GetFlight(context.Background(), flightNumber)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

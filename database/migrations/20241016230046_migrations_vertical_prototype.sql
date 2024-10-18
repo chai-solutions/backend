@@ -82,6 +82,12 @@ CREATE TABLE IF NOT EXISTS airlines (
 ALTER TABLE flight_plans ADD FOREIGN KEY (users) REFERENCES users (id);
 
 ALTER TABLE flight_plan_flights ADD FOREIGN KEY (flight_plan) REFERENCES flight_plans (id);
+ALTER TABLE flight_plan_flights
+DROP CONSTRAINT flight_plan_flights_flight_plan_fkey,
+ADD CONSTRAINT flight_plan_flights_flight_plan_fkey
+FOREIGN KEY (flight_plan)
+REFERENCES flight_plans (id)
+ON DELETE CASCADE;
 
 ALTER TABLE flight_plan_flights ADD FOREIGN KEY (flight) REFERENCES flights (id);
 

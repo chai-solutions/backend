@@ -26,22 +26,22 @@ func (a *App) PatchFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "malformed JSON", http.StatusBadRequest)
 		return
 	}
-	planId, err := strconv.Atoi(chi.URLParam(r, "id"))
+	planID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "Invalid Flight ID", http.StatusBadRequest)
 		return
 	}
 	params.FlightNumber = body.FlightNumber
-	params.FlightPlan = int32(planId)
+	params.FlightPlan = int32(planID)
 
-	flight_plan, err := a.Queries.PatchFlightPlan(context.Background(), params)
+	flightPlan, err := a.Queries.PatchFlightPlan(context.Background(), params)
 	if err != nil {
 		http.Error(w, "failed to insert flight plan flight", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(flight_plan); err != nil {
+	if err := json.NewEncoder(w).Encode(flightPlan); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 
@@ -60,7 +60,7 @@ func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	params.Users = user.ID
 	params.FlightNumber = body.FlightNumber
 
-	flight_plan, err := a.Queries.CreateFlightPlan(context.Background(), params)
+	flightPlan, err := a.Queries.CreateFlightPlan(context.Background(), params)
 	if err != nil {
 		log.Error().AnErr("CreateFlightPlan", err).Msg("Failed to create flight plan")
 		http.Error(w, "Failed to create flight plan", http.StatusInternalServerError)
@@ -68,7 +68,7 @@ func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(flight_plan); err != nil {
+	if err := json.NewEncoder(w).Encode(flightPlan); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
 
@@ -115,4 +115,46 @@ func (a *App) GetFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(flightPlans); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
 	}
+}
+
+func (a *App) DeleteFlightPlan(w http.ResponseWriter, r *http.Request) {
+	_ = middleware.MustGetUserFromContext(r.Context())
+	planID, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		http.Error(w, "Invalid Flight Plan ID", http.StatusBadRequest)
+		return
+	}
+
+	flightPlan, err := a.Queries.DeleteFlightPlan(context.Background(), int32(planID))
+	if err != nil {
+		log.Error().AnErr("DeleteFlightPlan", err).Msg("Failed to delete flight plan")
+		http.Error(w, "Failed to delete flight plan", http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(flightPlan); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (a *App) DeleteFlightPlanStep(w http.ResponseWriter, r *http.Request) {
+	stepID, err := strconv.Atoi(chi.URLParam(r, "stepID"))
+	if err != nil {
+		http.Error(w, "Invalid Flight Plan Step ID", http.StatusBadRequest)
+		return
+	}
+
+	flightPlan, err := a.Queries.DeleteFlightPlanStep(context.Background(), int32(stepID))
+	if err != nil {
+		log.Error().AnErr("DeleteFlightPlanStep", err).Msg("Failed to delete flight plan step")
+		http.Error(w, "Failed to delete flight plan step", http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(flightPlan); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

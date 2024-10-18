@@ -5,7 +5,11 @@ meta {
 }
 
 delete {
-  url: {{url}}/flight_plans/id
+  url: {{url}}/flight_plans/1
   body: none
   auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
 }
