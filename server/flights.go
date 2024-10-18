@@ -12,21 +12,27 @@ import (
 func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 	depAirport := r.URL.Query().Get("departure_airport")
 	arrAirport := r.URL.Query().Get("arrival_airport")
-	if depAirport == "" || arrAirport == "" {
-		http.Error(w, "Missing Arrival or Departure Airport", http.StatusBadRequest)
+	if depAirport == "" {
+		http.Error(w, "Missing Departure Airport", http.StatusBadRequest)
+		return
 	}
 
-	var params sqlc.GetFlightsParams
-	params.Arr = arrAirport
-	params.Dep = depAirport
+	if arrAirport == "" {
+		http.Error(w, "Missing Arrival Airport", http.StatusBadRequest)
+		return
+	}
+
+	params := sqlc.GetFlightsParams{
+		Arr: arrAirport,
+		Dep: depAirport,
+	}
 
 	flights, err := a.Queries.GetFlights(context.Background(), params)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
-	err = json.NewEncoder(w).Encode(
-		flights)
+	err = json.NewEncoder(w).Encode(flights)
 	_ = err
 }
 

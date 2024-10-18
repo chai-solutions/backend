@@ -36,43 +36,26 @@ func (q *Queries) CreateFlightPlan(ctx context.Context, arg CreateFlightPlanPara
 	return i, err
 }
 
-const deleteFlightPlan = `-- name: DeleteFlightPlan :many
+const deleteFlightPlan = `-- name: DeleteFlightPlan :exec
 DELETE FROM flight_plans
 WHERE id = $1
 RETURNING id, users
 `
 
-func (q *Queries) DeleteFlightPlan(ctx context.Context, id int32) ([]FlightPlan, error) {
-	rows, err := q.db.Query(ctx, deleteFlightPlan, id)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-	var items []FlightPlan
-	for rows.Next() {
-		var i FlightPlan
-		if err := rows.Scan(&i.ID, &i.Users); err != nil {
-			return nil, err
-		}
-		items = append(items, i)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, err
-	}
-	return items, nil
+func (q *Queries) DeleteFlightPlan(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteFlightPlan, id)
+	return err
 }
 
-const deleteFlightPlanStep = `-- name: DeleteFlightPlanStep :one
+const deleteFlightPlanStep = `-- name: DeleteFlightPlanStep :exec
 DELETE FROM flight_plan_flights
 WHERE id = $1
 RETURNING id, flight_plan, flight
 `
 
-func (q *Queries) DeleteFlightPlanStep(ctx context.Context, id int32) (FlightPlanFlight, error) {
-	row := q.db.QueryRow(ctx, deleteFlightPlanStep, id)
-	var i FlightPlanFlight
-	err := row.Scan(&i.ID, &i.FlightPlan, &i.Flight)
-	return i, err
+func (q *Queries) DeleteFlightPlanStep(ctx context.Context, id int32) error {
+	_, err := q.db.Exec(ctx, deleteFlightPlanStep, id)
+	return err
 }
 
 const getFlightPlan = `-- name: GetFlightPlan :many
