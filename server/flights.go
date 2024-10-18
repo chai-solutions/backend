@@ -9,11 +9,6 @@ import (
 	"github.com/go-chi/chi/v5"
 )
 
-type FlightRes struct {
-	Message string      `json:"message"`
-	Data    interface{} `json:"accounts"`
-}
-
 func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 	depAirport := r.URL.Query().Get("departure_airport")
 	arrAirport := r.URL.Query().Get("arrival_airport")
@@ -31,10 +26,7 @@ func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = json.NewEncoder(w).Encode(
-		FlightRes{
-			Message: "Flights retrieved successfully",
-			Data:    flights,
-		})
+		flights)
 	_ = err
 }
 
@@ -52,10 +44,7 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = json.NewEncoder(w).Encode(
-		FlightRes{
-			Message: "Flight retrieved successfully",
-			Data:    flight,
-		})
+		flight)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

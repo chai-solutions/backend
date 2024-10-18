@@ -13,9 +13,14 @@ import (
 
 const getFlight = `-- name: GetFlight :one
 SELECT 
-    f.id, f.flight_number, f.sched_dep_time, f.actual_arr_time, f.actual_dep_time,
-    a.iata AS arrival_iata, a.name AS arrival_name,
-    d.iata AS dep_iata, d.name AS dep_name
+    f.id, f.flight_number, 
+    f.sched_dep_time, 
+    f.actual_arr_time, 
+    f.actual_dep_time,
+    d.iata AS dep_iata, 
+    a.iata AS arrival_iata, 
+    d.name AS dep_name,
+    a.name AS arrival_name
 FROM flights AS f
 INNER JOIN airports AS d
     ON d.id = f.dep_airport
@@ -30,10 +35,10 @@ type GetFlightRow struct {
 	SchedDepTime  pgtype.Timestamp `json:"sched_dep_time"`
 	ActualArrTime pgtype.Timestamp `json:"actual_arr_time"`
 	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
-	ArrivalIata   string           `json:"arrival_iata"`
-	ArrivalName   string           `json:"arrival_name"`
 	DepIata       string           `json:"dep_iata"`
+	ArrivalIata   string           `json:"arrival_iata"`
 	DepName       string           `json:"dep_name"`
+	ArrivalName   string           `json:"arrival_name"`
 }
 
 func (q *Queries) GetFlight(ctx context.Context, flightNumber string) (GetFlightRow, error) {
@@ -45,10 +50,10 @@ func (q *Queries) GetFlight(ctx context.Context, flightNumber string) (GetFlight
 		&i.SchedDepTime,
 		&i.ActualArrTime,
 		&i.ActualDepTime,
-		&i.ArrivalIata,
-		&i.ArrivalName,
 		&i.DepIata,
+		&i.ArrivalIata,
 		&i.DepName,
+		&i.ArrivalName,
 	)
 	return i, err
 }

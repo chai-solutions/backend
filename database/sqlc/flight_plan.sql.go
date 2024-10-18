@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-const createFlightPlan = `-- name: CreateFlightPlan :exec
+const createFlightPlan = `-- name: CreateFlightPlan :one
 WITH new_flight_plan AS (
     INSERT INTO flight_plans (users)
     VALUES ($2)
@@ -21,6 +21,7 @@ INSERT INTO flight_plan_flights (flight_plan, flight)
 SELECT new_flight_plan.id, f.id
 FROM flights AS f, new_flight_plan
 WHERE f.flight_number = $1
+RETURNING flight_plan_flights.id, flight_plan_flights.flight_plan, flight_plan_flights.flight
 `
 
 type CreateFlightPlanParams struct {
@@ -28,31 +29,33 @@ type CreateFlightPlanParams struct {
 	Users        int32  `json:"users"`
 }
 
-func (q *Queries) CreateFlightPlan(ctx context.Context, arg CreateFlightPlanParams) error {
-	_, err := q.db.Exec(ctx, createFlightPlan, arg.FlightNumber, arg.Users)
-	return err
+func (q *Queries) CreateFlightPlan(ctx context.Context, arg CreateFlightPlanParams) (FlightPlanFlight, error) {
+	row := q.db.QueryRow(ctx, createFlightPlan, arg.FlightNumber, arg.Users)
+	var i FlightPlanFlight
+	err := row.Scan(&i.ID, &i.FlightPlan, &i.Flight)
+	return i, err
 }
 
-const getFlightPlan = `-- name: GetFlightPlan :one
+const getFlightPlan = `-- name: GetFlightPlan :many
 SELECT 
     fp.id,
     f.flight_number,
-    departure_airport.name,
-    arrival_airport.name,
+    departure_airport.name AS dep_airport_name,
+    arrival_airport.name AS arr_airport_airport,
     f.sched_dep_time,
     f.sched_arr_time,
     f.actual_dep_time,
     f.actual_arr_time
 FROM flight_plans AS fp
 JOIN flight_plan_flights AS fpf
-ON flight_plans.id = fpf.flight_plan
+ON fp.id = fpf.flight_plan
 JOIN flights AS f
-ON flight_plan_flights.flight = f.id
+ON fpf.flight = f.id
 JOIN airports AS departure_airport
-ON flights.dep_airport = d.id
+ON f.dep_airport = departure_airport.id
 JOIN airports AS arrival_airport
-ON flights.arr_airport = a.id
-WHERE flight_plans.users = $1 AND fp.id = $2
+ON f.arr_airport = arrival_airport.id
+WHERE fp.users = $1 AND fp.id = $2
 `
 
 type GetFlightPlanParams struct {
@@ -61,38 +64,51 @@ type GetFlightPlanParams struct {
 }
 
 type GetFlightPlanRow struct {
-	ID            int32            `json:"id"`
-	FlightNumber  string           `json:"flight_number"`
-	Name          string           `json:"name"`
-	Name_2        string           `json:"name_2"`
-	SchedDepTime  pgtype.Timestamp `json:"sched_dep_time"`
-	SchedArrTime  pgtype.Timestamp `json:"sched_arr_time"`
-	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
-	ActualArrTime pgtype.Timestamp `json:"actual_arr_time"`
+	ID                int32            `json:"id"`
+	FlightNumber      string           `json:"flight_number"`
+	DepAirportName    string           `json:"dep_airport_name"`
+	ArrAirportAirport string           `json:"arr_airport_airport"`
+	SchedDepTime      pgtype.Timestamp `json:"sched_dep_time"`
+	SchedArrTime      pgtype.Timestamp `json:"sched_arr_time"`
+	ActualDepTime     pgtype.Timestamp `json:"actual_dep_time"`
+	ActualArrTime     pgtype.Timestamp `json:"actual_arr_time"`
 }
 
-func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) (GetFlightPlanRow, error) {
-	row := q.db.QueryRow(ctx, getFlightPlan, arg.Users, arg.ID)
-	var i GetFlightPlanRow
-	err := row.Scan(
-		&i.ID,
-		&i.FlightNumber,
-		&i.Name,
-		&i.Name_2,
-		&i.SchedDepTime,
-		&i.SchedArrTime,
-		&i.ActualDepTime,
-		&i.ActualArrTime,
-	)
-	return i, err
+func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) ([]GetFlightPlanRow, error) {
+	rows, err := q.db.Query(ctx, getFlightPlan, arg.Users, arg.ID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetFlightPlanRow
+	for rows.Next() {
+		var i GetFlightPlanRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FlightNumber,
+			&i.DepAirportName,
+			&i.ArrAirportAirport,
+			&i.SchedDepTime,
+			&i.SchedArrTime,
+			&i.ActualDepTime,
+			&i.ActualArrTime,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }
 
 const getFlightPlans = `-- name: GetFlightPlans :many
 SELECT 
     flight_plans.id AS flight_plan_id,
     flights.flight_number,
-    dep_airport.name AS departure_airport,
-    arr_airport.name AS arrival_airport,
+    dep_airport.name AS dep_airport,
+    arr_airport.name AS arr_airport,
     flights.sched_dep_time,
     flights.sched_arr_time,
     flights.actual_dep_time,
@@ -110,14 +126,14 @@ WHERE flight_plans.users = $1
 `
 
 type GetFlightPlansRow struct {
-	FlightPlanID     int32            `json:"flight_plan_id"`
-	FlightNumber     string           `json:"flight_number"`
-	DepartureAirport string           `json:"departure_airport"`
-	ArrivalAirport   string           `json:"arrival_airport"`
-	SchedDepTime     pgtype.Timestamp `json:"sched_dep_time"`
-	SchedArrTime     pgtype.Timestamp `json:"sched_arr_time"`
-	ActualDepTime    pgtype.Timestamp `json:"actual_dep_time"`
-	ActualArrTime    pgtype.Timestamp `json:"actual_arr_time"`
+	FlightPlanID  int32            `json:"flight_plan_id"`
+	FlightNumber  string           `json:"flight_number"`
+	DepAirport    string           `json:"dep_airport"`
+	ArrAirport    string           `json:"arr_airport"`
+	SchedDepTime  pgtype.Timestamp `json:"sched_dep_time"`
+	SchedArrTime  pgtype.Timestamp `json:"sched_arr_time"`
+	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
+	ActualArrTime pgtype.Timestamp `json:"actual_arr_time"`
 }
 
 func (q *Queries) GetFlightPlans(ctx context.Context, users int32) ([]GetFlightPlansRow, error) {
@@ -132,8 +148,8 @@ func (q *Queries) GetFlightPlans(ctx context.Context, users int32) ([]GetFlightP
 		if err := rows.Scan(
 			&i.FlightPlanID,
 			&i.FlightNumber,
-			&i.DepartureAirport,
-			&i.ArrivalAirport,
+			&i.DepAirport,
+			&i.ArrAirport,
 			&i.SchedDepTime,
 			&i.SchedArrTime,
 			&i.ActualDepTime,
@@ -149,12 +165,13 @@ func (q *Queries) GetFlightPlans(ctx context.Context, users int32) ([]GetFlightP
 	return items, nil
 }
 
-const patchFlightPlan = `-- name: PatchFlightPlan :exec
+const patchFlightPlan = `-- name: PatchFlightPlan :one
 INSERT INTO flight_plan_flights (flight_plan, flight)
 SELECT fp.id, f.id
 FROM flight_plans AS fp
 JOIN flights AS f ON f.flight_number = $1
 WHERE fp.id = $2
+RETURNING flight_plan_flights.id, flight_plan_flights.flight_plan, flight_plan_flights.flight
 `
 
 type PatchFlightPlanParams struct {
@@ -162,7 +179,9 @@ type PatchFlightPlanParams struct {
 	FlightPlan   int32  `json:"flight_plan"`
 }
 
-func (q *Queries) PatchFlightPlan(ctx context.Context, arg PatchFlightPlanParams) error {
-	_, err := q.db.Exec(ctx, patchFlightPlan, arg.FlightNumber, arg.FlightPlan)
-	return err
+func (q *Queries) PatchFlightPlan(ctx context.Context, arg PatchFlightPlanParams) (FlightPlanFlight, error) {
+	row := q.db.QueryRow(ctx, patchFlightPlan, arg.FlightNumber, arg.FlightPlan)
+	var i FlightPlanFlight
+	err := row.Scan(&i.ID, &i.FlightPlan, &i.Flight)
+	return i, err
 }

@@ -34,13 +34,16 @@ func (a *App) PatchFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	params.FlightNumber = body.FlightNumber
 	params.FlightPlan = int32(planId)
 
-	err = a.Queries.PatchFlightPlan(context.Background(), params)
+	flight_plan, err := a.Queries.PatchFlightPlan(context.Background(), params)
 	if err != nil {
 		http.Error(w, "failed to insert flight plan flight", http.StatusInternalServerError)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(flight_plan); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 
 	w.WriteHeader(http.StatusCreated)
 }
@@ -57,7 +60,7 @@ func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	params.Users = user.ID
 	params.FlightNumber = body.FlightNumber
 
-	err = a.Queries.CreateFlightPlan(context.Background(), params)
+	flight_plan, err := a.Queries.CreateFlightPlan(context.Background(), params)
 	if err != nil {
 		log.Error().AnErr("CreateFlightPlan", err).Msg("Failed to create flight plan")
 		http.Error(w, "Failed to create flight plan", http.StatusInternalServerError)
@@ -65,6 +68,9 @@ func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusCreated)
+	if err := json.NewEncoder(w).Encode(flight_plan); err != nil {
+		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
+	}
 
 	w.Header().Set("Content-Type", "application/json")
 }
@@ -87,15 +93,15 @@ func (a *App) GetFlightPlansHandler(w http.ResponseWriter, r *http.Request) {
 
 func (a *App) GetFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	user := middleware.MustGetUserFromContext(r.Context())
-	idInt, err := strconv.Atoi(chi.URLParam(r, "id"))
+	param, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "Invalid Flight ID", http.StatusBadRequest)
 		return
 	}
-	flightPlanId := int32(idInt)
+	flightPlanID := int32(param)
 	params := sqlc.GetFlightPlanParams{
 		Users: user.ID,
-		ID:    flightPlanId,
+		ID:    flightPlanID,
 	}
 
 	flightPlans, err := a.Queries.GetFlightPlan(context.Background(), params)

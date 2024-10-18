@@ -14,9 +14,14 @@ AND a.iata = @arr
 
 -- name: GetFlight :one
 SELECT 
-    f.id, f.flight_number, f.sched_dep_time, f.actual_arr_time, f.actual_dep_time,
-    a.iata AS arrival_iata, a.name AS arrival_name,
-    d.iata AS dep_iata, d.name AS dep_name
+    f.id, f.flight_number, 
+    f.sched_dep_time, 
+    f.actual_arr_time, 
+    f.actual_dep_time,
+    d.iata AS dep_iata, 
+    a.iata AS arrival_iata, 
+    d.name AS dep_name,
+    a.name AS arrival_name
 FROM flights AS f
 INNER JOIN airports AS d
     ON d.id = f.dep_airport
