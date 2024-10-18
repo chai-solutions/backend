@@ -22,5 +22,5 @@ INNER JOIN airports AS d
     ON d.id = f.dep_airport
 INNER JOIN airports AS a
     ON a.id = f.arr_airport
-WHERE f.id = @id
+WHERE f.flight_number = @flight_number
 ;

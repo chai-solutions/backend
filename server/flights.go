@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"strconv"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -40,14 +39,16 @@ func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
-	idInt, err := strconv.Atoi(chi.URLParam(r, "id"))
-	if err != nil {
-		http.Error(w, "Invalid Flight ID", http.StatusBadRequest)
+	flight_number := chi.URLParam(r, "flight_number")
+	if flight_number == "" {
+		http.Error(w, "Invalid Flight Number", http.StatusBadRequest)
+		return
 	}
 
-	flight, err := a.Queries.GetFlight(context.Background(), int32(idInt))
+	flight, err := a.Queries.GetFlight(context.Background(), flight_number)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	err = json.NewEncoder(w).Encode(
@@ -55,5 +56,8 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 			Message: "Flight retrieved successfully",
 			Data:    flight,
 		})
-	_ = err
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 }

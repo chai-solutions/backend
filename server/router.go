@@ -27,13 +27,13 @@ func (a *App) RegisterRoutes() {
 
 		r.Get("/airports", a.AirportsHandler)
 
-		r.Post("/flight_plan", a.CreateFlightPlanHandler)
-		r.Post("/flight_plan/{id}", a.PatchFlightPlanHandler)
+		r.Get("/flights", a.FlightsHandler)
+		r.Get("/flights/{flight_number}", a.FlightHandler)
+
+		r.Post("/flight_plans", a.CreateFlightPlanHandler)
+		r.Post("/flight_plans/{id}", a.PatchFlightPlanHandler)
 		r.Get("/flight_plans", a.GetFlightPlansHandler)
 		r.Get("/flight_plans/{id}", a.GetFlightPlanHandler)
-
-		r.Get("/flights", a.FlightsHandler)
-		r.Get("/flights/{id}", a.FlightHandler)
 	})
 
 }

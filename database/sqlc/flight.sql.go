@@ -21,7 +21,7 @@ INNER JOIN airports AS d
     ON d.id = f.dep_airport
 INNER JOIN airports AS a
     ON a.id = f.arr_airport
-WHERE f.id = $1
+WHERE f.flight_number = $1
 `
 
 type GetFlightRow struct {
@@ -36,8 +36,8 @@ type GetFlightRow struct {
 	DepName       string           `json:"dep_name"`
 }
 
-func (q *Queries) GetFlight(ctx context.Context, id int32) (GetFlightRow, error) {
-	row := q.db.QueryRow(ctx, getFlight, id)
+func (q *Queries) GetFlight(ctx context.Context, flightNumber string) (GetFlightRow, error) {
+	row := q.db.QueryRow(ctx, getFlight, flightNumber)
 	var i GetFlightRow
 	err := row.Scan(
 		&i.ID,
