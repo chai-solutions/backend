@@ -7,7 +7,7 @@ WITH new_flight_plan AS (
 INSERT INTO flight_plan_flights (flight_plan, flight)
 SELECT new_flight_plan.id, f.id
 FROM flights AS f, new_flight_plan
-WHERE f.flight_number = @flight_number
+WHERE f.flight_number = @flightNumber
 RETURNING flight_plan_flights.*
 ;
 
@@ -26,6 +26,8 @@ SELECT
     flights.flight_number,
     dep_airport.name AS dep_airport,
     arr_airport.name AS arr_airport,
+    dep_airport.iata,
+    arr_airport.iata,
     flights.sched_dep_time,
     flights.sched_arr_time,
     flights.actual_dep_time,
@@ -47,7 +49,9 @@ SELECT
     fp.id,
     f.flight_number,
     departure_airport.name AS dep_airport_name,
-    arrival_airport.name AS arr_airport_airport,
+    arrival_airport.name AS arr_airport_name,
+    arrival_airport.iata AS arr_iata,
+    departure_airport.iata AS dep_iata,
     f.sched_dep_time,
     f.sched_arr_time,
     f.actual_dep_time,

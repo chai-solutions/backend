@@ -25,12 +25,12 @@ RETURNING flight_plan_flights.id, flight_plan_flights.flight_plan, flight_plan_f
 `
 
 type CreateFlightPlanParams struct {
-	FlightNumber string `json:"flight_number"`
+	Flightnumber string `json:"flightnumber"`
 	Users        int32  `json:"users"`
 }
 
 func (q *Queries) CreateFlightPlan(ctx context.Context, arg CreateFlightPlanParams) (FlightPlanFlight, error) {
-	row := q.db.QueryRow(ctx, createFlightPlan, arg.FlightNumber, arg.Users)
+	row := q.db.QueryRow(ctx, createFlightPlan, arg.Flightnumber, arg.Users)
 	var i FlightPlanFlight
 	err := row.Scan(&i.ID, &i.FlightPlan, &i.Flight)
 	return i, err
@@ -63,7 +63,9 @@ SELECT
     fp.id,
     f.flight_number,
     departure_airport.name AS dep_airport_name,
-    arrival_airport.name AS arr_airport_airport,
+    arrival_airport.name AS arr_airport_name,
+    arrival_airport.iata AS arr_iata,
+    departure_airport.iata AS dep_iata,
     f.sched_dep_time,
     f.sched_arr_time,
     f.actual_dep_time,
@@ -86,14 +88,16 @@ type GetFlightPlanParams struct {
 }
 
 type GetFlightPlanRow struct {
-	ID                int32            `json:"id"`
-	FlightNumber      string           `json:"flight_number"`
-	DepAirportName    string           `json:"dep_airport_name"`
-	ArrAirportAirport string           `json:"arr_airport_airport"`
-	SchedDepTime      pgtype.Timestamp `json:"sched_dep_time"`
-	SchedArrTime      pgtype.Timestamp `json:"sched_arr_time"`
-	ActualDepTime     pgtype.Timestamp `json:"actual_dep_time"`
-	ActualArrTime     pgtype.Timestamp `json:"actual_arr_time"`
+	ID             int32            `json:"id"`
+	FlightNumber   string           `json:"flight_number"`
+	DepAirportName string           `json:"dep_airport_name"`
+	ArrAirportName string           `json:"arr_airport_name"`
+	ArrIata        string           `json:"arr_iata"`
+	DepIata        string           `json:"dep_iata"`
+	SchedDepTime   pgtype.Timestamp `json:"sched_dep_time"`
+	SchedArrTime   pgtype.Timestamp `json:"sched_arr_time"`
+	ActualDepTime  pgtype.Timestamp `json:"actual_dep_time"`
+	ActualArrTime  pgtype.Timestamp `json:"actual_arr_time"`
 }
 
 func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) ([]GetFlightPlanRow, error) {
@@ -109,7 +113,9 @@ func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) ([
 			&i.ID,
 			&i.FlightNumber,
 			&i.DepAirportName,
-			&i.ArrAirportAirport,
+			&i.ArrAirportName,
+			&i.ArrIata,
+			&i.DepIata,
 			&i.SchedDepTime,
 			&i.SchedArrTime,
 			&i.ActualDepTime,
@@ -131,6 +137,8 @@ SELECT
     flights.flight_number,
     dep_airport.name AS dep_airport,
     arr_airport.name AS arr_airport,
+    dep_airport.iata,
+    arr_airport.iata,
     flights.sched_dep_time,
     flights.sched_arr_time,
     flights.actual_dep_time,
@@ -152,6 +160,8 @@ type GetFlightPlansRow struct {
 	FlightNumber  string           `json:"flight_number"`
 	DepAirport    string           `json:"dep_airport"`
 	ArrAirport    string           `json:"arr_airport"`
+	Iata          string           `json:"iata"`
+	Iata_2        string           `json:"iata_2"`
 	SchedDepTime  pgtype.Timestamp `json:"sched_dep_time"`
 	SchedArrTime  pgtype.Timestamp `json:"sched_arr_time"`
 	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
@@ -172,6 +182,8 @@ func (q *Queries) GetFlightPlans(ctx context.Context, users int32) ([]GetFlightP
 			&i.FlightNumber,
 			&i.DepAirport,
 			&i.ArrAirport,
+			&i.Iata,
+			&i.Iata_2,
 			&i.SchedDepTime,
 			&i.SchedArrTime,
 			&i.ActualDepTime,

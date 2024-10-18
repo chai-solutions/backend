@@ -60,7 +60,7 @@ func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 
 	params := sqlc.CreateFlightPlanParams{
 		Users:        user.ID,
-		FlightNumber: body.FlightNumber,
+		Flightnumber: body.FlightNumber,
 	}
 
 	flightPlan, err := a.Queries.CreateFlightPlan(context.Background(), params)
