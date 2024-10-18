@@ -1,17 +1,13 @@
 meta {
   name: Get Flight Plans Single
   type: http
-  seq: 13
+  seq: 12
 }
 
 get {
-  url: {{url}}/flight_plans?id=1
+  url: {{url}}/flight_plans/1
   body: none
   auth: none
-}
-
-params:query {
-  id: 1
 }
 
 headers {

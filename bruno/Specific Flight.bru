@@ -1,11 +1,15 @@
 meta {
   name: Specific Flight
   type: http
-  seq: 8
+  seq: 11
 }
 
 get {
-  url: {{url}}/flights/
+  url: {{url}}/flights
   body: none
   auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
 }

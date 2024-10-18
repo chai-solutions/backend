@@ -5,11 +5,17 @@ meta {
 }
 
 post {
-  url: {{url}}/flight_plan/1/1
-  body: none
+  url: {{url}}/flight_plan/1
+  body: json
   auth: none
 }
 
 headers {
   Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "flight_number" : "WN568"
+  }
 }
