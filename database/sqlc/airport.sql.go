@@ -9,6 +9,25 @@ import (
 	"context"
 )
 
+const getAirport = `-- name: GetAirport :one
+SELECT a.id, a.iata, a.name, a.latitude, a.longitude
+FROM airports AS a
+WHERE a.iata = $1
+`
+
+func (q *Queries) GetAirport(ctx context.Context, iata string) (Airport, error) {
+	row := q.db.QueryRow(ctx, getAirport, iata)
+	var i Airport
+	err := row.Scan(
+		&i.ID,
+		&i.Iata,
+		&i.Name,
+		&i.Latitude,
+		&i.Longitude,
+	)
+	return i, err
+}
+
 const getAllAirports = `-- name: GetAllAirports :many
 SELECT id, iata, name, latitude, longitude
 FROM airports

@@ -81,7 +81,7 @@ func (a *App) GetFlightPlansHandler(w http.ResponseWriter, r *http.Request) {
 
 	flightPlans, err := a.Queries.GetFlightPlans(context.Background(), user.ID)
 	if err != nil {
-		log.Error().AnErr("GetFlightPlans", err).Msg("Failed to get flight plans")
+		log.Error().AnErr("GetFlightPlan", err).Msg("Failed to get flight plans")
 		http.Error(w, "Failed to get flight plans", http.StatusInternalServerError)
 		return
 	}
@@ -107,7 +107,7 @@ func (a *App) GetFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 
 	flightPlans, err := a.Queries.GetFlightPlan(context.Background(), params)
 	if err != nil {
-		log.Error().AnErr("GetFlightPlans", err).Msg("Failed to get flight plans")
+		log.Error().AnErr("GetFlightPlan", err).Msg("Failed to get flight plans")
 		http.Error(w, "Failed to get flight plans", http.StatusInternalServerError)
 		return
 	}

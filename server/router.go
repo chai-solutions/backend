@@ -36,6 +36,7 @@ func (a *App) RegisterRoutes() {
 		r.Get("/flight_plans/{id}", a.GetFlightPlanHandler)
 		r.Delete("/flight_plans/{id}/{stepID}", a.DeleteFlightPlanStep)
 		r.Delete("/flight_plans/{id}", a.DeleteFlightPlan)
-	})
 
+		r.Get("/maps/{iata}", a.AirportMapHandler)
+	})
 }
