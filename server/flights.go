@@ -4,9 +4,7 @@ import (
 	"chai/database/sqlc"
 	"context"
 	"encoding/json"
-	"fmt"
 	"net/http"
-
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -60,32 +58,38 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func timeDiff(firstDate, lastDate string) (int64, error) {
-	//test retrieved strings
-	fmt.Println(firstDate + " " + lastDate)
+// parameters: Flight numbers for 2 different flights
+func (a *App) timeDiff(firstFlightNum, secondFlightNum string) (time.Duration, error) {
 
-	//we need this for some reason, to tell go how date is set up?
-	layout := "2006-01-02 15:04:05"
-
-	//parse first time
-	t1, err := time.Parse(layout, firstDate)
+	firstFlight, err := a.Queries.GetFlight(context.Background(), firstFlightNum)
 	if err != nil {
-		return 0, err
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		return -1, err
+	}
+	secondFlight, err := a.Queries.GetFlight(context.Background(), secondFlightNum)
+	if err != nil {
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		return -1, err
 	}
 
-	//parse second time
-	t2, err := time.Parse(layout, lastDate)
-	if err != nil {
-		return 0, err
+	//get arrival times for flights
+	firstFlightArr := firstFlight.ActualArrTime.Time
+	secondFlightArr := secondFlight.ActualArrTime.Time
+
+	//if secondflight comes first, swap flights for readability
+	if firstFlightArr.Compare(secondFlightArr) == 1 {
+		firstFlight, secondFlight = secondFlight, firstFlight
+		//swap arrival time variables
+		firstFlightArr = firstFlight.ActualArrTime.Time
+		secondFlightArr = secondFlight.ActualArrTime.Time
 	}
 
-	//define diff variable so it's not trapped in if statement
+	firstFlightDep := firstFlight.ActualDepTime.Time
+
+	//find layover between first and second flight
 	var diff time.Duration
-	//find absolute difference between times
-	diff = t2.Sub(t1).Abs() // Use Abs() for absolute difference
+	//find difference between times
+	diff = secondFlightArr.Sub(firstFlightDep)
 
-	//convert time difference into int64 (not sure about this output variable type)
-	outSec := diff.Seconds()
-	outInt64 := int64(outSec)
-	return outInt64, nil
+	return diff, nil
 }
