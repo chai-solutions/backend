@@ -59,24 +59,24 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // parameters: Flight numbers for 2 different flights
-func (a *App) timeDiff(firstFlightNum, secondFlightNum string) (time.Duration, error) {
+func (a *App) TimeDiff(firstFlightNum, secondFlightNum string) (time.Duration, error) {
 
 	firstFlight, err := a.Queries.GetFlight(context.Background(), firstFlightNum)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
-		return -1, err
+		return 0, err
 	}
 	secondFlight, err := a.Queries.GetFlight(context.Background(), secondFlightNum)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
-		return -1, err
+		return 0, err
 	}
 
 	//get arrival times for flights
 	firstFlightArr := firstFlight.ActualArrTime.Time
 	secondFlightArr := secondFlight.ActualArrTime.Time
 
-	//if secondflight comes first, swap flights for readability
+	//if secondFlight comes first, swap flights for readability
 	if firstFlightArr.Compare(secondFlightArr) == 1 {
 		firstFlight, secondFlight = secondFlight, firstFlight
 		//swap arrival time variables
