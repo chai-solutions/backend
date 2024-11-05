@@ -58,11 +58,6 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// struct required by sql to pass 2 flight numbers into params
-type GetTwoFlightsParams struct {
-	FlightNumbers [2]string // Array to hold both flight numbers
-}
-
 // parameters: Flight numbers for 2 different flights
 func (a *App) TimeDiff(firstFlightNum, secondFlightNum string) (time.Duration, error) {
 
