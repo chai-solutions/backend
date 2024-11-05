@@ -1,31 +1,54 @@
 -- name: GetFlights :many
-SELECT 
-    f.id, f.flight_number, f.sched_dep_time, f.actual_arr_time, f.actual_dep_time,
-    a.iata AS arrival_iata, a.name AS arrival_name,
-    d.iata AS dep_iata, d.name AS dep_name
-FROM flights AS f
-INNER JOIN airports AS d
-    ON d.id = f.dep_airport
-INNER JOIN airports AS a
-    ON a.id = f.arr_airport
-WHERE d.iata = @dep
-AND a.iata = @arr
-;
+SELECT
+    f.id,
+    f.flight_number,
+    f.sched_dep_time,
+    f.actual_arr_time,
+    f.actual_dep_time,
+    a.iata AS arrival_iata,
+    a.name AS arrival_name,
+    d.iata AS dep_iata,
+    d.name AS dep_name
+FROM
+    flights AS f
+    INNER JOIN airports AS d ON d.id = f.dep_airport
+    INNER JOIN airports AS a ON a.id = f.arr_airport
+WHERE
+    d.iata = @dep
+    AND a.iata = @arr;
 
 -- name: GetFlight :one
-SELECT 
-    f.id, f.flight_number, 
-    f.sched_dep_time, 
-    f.actual_arr_time, 
+SELECT
+    f.id,
+    f.flight_number,
+    f.sched_dep_time,
+    f.actual_arr_time,
     f.actual_dep_time,
-    d.iata AS dep_iata, 
-    a.iata AS arrival_iata, 
+    d.iata AS dep_iata,
+    a.iata AS arrival_iata,
     d.name AS dep_name,
     a.name AS arrival_name
-FROM flights AS f
-INNER JOIN airports AS d
-    ON d.id = f.dep_airport
-INNER JOIN airports AS a
-    ON a.id = f.arr_airport
-WHERE f.flight_number = @flight_number
-;
+FROM
+    flights AS f
+    INNER JOIN airports AS d ON d.id = f.dep_airport
+    INNER JOIN airports AS a ON a.id = f.arr_airport
+WHERE
+    f.flight_number = @flight_number;
+
+-- name: GetTwoFlights :many
+SELECT
+    f.id,
+    f.flight_number,
+    f.sched_dep_time,
+    f.actual_arr_time,
+    f.actual_dep_time,
+    d.iata AS dep_iata,
+    a.iata AS arrival_iata,
+    d.name AS dep_name,
+    a.name AS arrival_name
+FROM
+    flights AS f
+    INNER JOIN airports AS d ON d.id = f.dep_airport
+    INNER JOIN airports AS a ON a.id = f.arr_airport
+WHERE
+    f.flight_number IN (@flight_number1, @flight_number2);

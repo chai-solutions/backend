@@ -58,33 +58,56 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// struct required by sql to pass 2 flight numbers into params
+type GetTwoFlightsParams struct {
+	FlightNumbers [2]string // Array to hold both flight numbers
+}
+
 // parameters: Flight numbers for 2 different flights
 func (a *App) TimeDiff(firstFlightNum, secondFlightNum string) (time.Duration, error) {
 
-	firstFlight, err := a.Queries.GetFlight(context.Background(), firstFlightNum)
-	if err != nil {
-		//http.Error(w, err.Error(), http.StatusInternalServerError)
-		return 0, err
-	}
-	secondFlight, err := a.Queries.GetFlight(context.Background(), secondFlightNum)
+	//firstFlight, err := a.Queries.GetFlight(context.Background(), firstFlightNum)
+	// if err != nil {
+	// 	//http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return 0, err
+	// }
+	// secondFlight, err := a.Queries.GetFlight(context.Background(), secondFlightNum)
+	// if err != nil {
+	// 	//http.Error(w, err.Error(), http.StatusInternalServerError)
+	// 	return 0, err
+	// }
+	// var flightsNumArray [2]string
+	// flightsNumArray[0] = firstFlightNum
+	// flightsNumArray[1] = secondFlightNum
+
+	//parameter for query
+	var flightsQueryParam sqlc.GetTwoFlightsParams
+
+	flightsQueryParam.FlightNumber1 = firstFlightNum
+	flightsQueryParam.FlightNumber2 = secondFlightNum
+
+	//storage for query response
+	var flightsArray []sqlc.GetTwoFlightsRow
+
+	flightsArray, err := a.Queries.GetTwoFlights(context.Background(), flightsQueryParam)
 	if err != nil {
 		//http.Error(w, err.Error(), http.StatusInternalServerError)
 		return 0, err
 	}
 
 	//get arrival times for flights
-	firstFlightArr := firstFlight.ActualArrTime.Time
-	secondFlightArr := secondFlight.ActualArrTime.Time
+	firstFlightArr := flightsArray[0].ActualArrTime.Time
+	secondFlightArr := flightsArray[1].ActualArrTime.Time
 
 	//if secondFlight comes first, swap flights for readability
 	if firstFlightArr.Compare(secondFlightArr) == 1 {
-		firstFlight, secondFlight = secondFlight, firstFlight
+		flightsArray[0], flightsArray[1] = flightsArray[0], flightsArray[1]
 		//swap arrival time variables
-		firstFlightArr = firstFlight.ActualArrTime.Time
-		secondFlightArr = secondFlight.ActualArrTime.Time
+		firstFlightArr = flightsArray[0].ActualArrTime.Time
+		secondFlightArr = flightsArray[1].ActualArrTime.Time
 	}
 
-	firstFlightDep := firstFlight.ActualDepTime.Time
+	firstFlightDep := flightsArray[0].ActualDepTime.Time
 
 	//find layover between first and second flight
 	var diff time.Duration
