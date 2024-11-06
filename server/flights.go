@@ -60,21 +60,6 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 
 // parameters: Flight numbers for 2 different flights
 func (a *App) TimeDiff(firstFlightNum, secondFlightNum string) (time.Duration, error) {
-
-	//firstFlight, err := a.Queries.GetFlight(context.Background(), firstFlightNum)
-	// if err != nil {
-	// 	//http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return 0, err
-	// }
-	// secondFlight, err := a.Queries.GetFlight(context.Background(), secondFlightNum)
-	// if err != nil {
-	// 	//http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return 0, err
-	// }
-	// var flightsNumArray [2]string
-	// flightsNumArray[0] = firstFlightNum
-	// flightsNumArray[1] = secondFlightNum
-
 	//parameter for query
 	var flightsQueryParam sqlc.GetTwoFlightsParams
 
