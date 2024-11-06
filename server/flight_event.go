@@ -9,11 +9,31 @@ import (
 	"github.com/rs/zerolog/log"
 )
 
-func (a *App) sendPushNotification(userIDs []string, eventType, flightNumber string) {
-	heading := fmt.Sprintf("Flight %s %s", flightNumber, eventType)
-	content := fmt.Sprintf("Your flight %s has been %s", flightNumber, eventType)
+func getNotificationPayload(userIDs []string, eventType string, flightNumber string) utils.NotificationPayload {
+	var heading, content string
+
+	switch eventType {
+	case "flight/delay":
+		heading = fmt.Sprintf("Flight %s delayed", flightNumber)
+		content = fmt.Sprintf("Your flight %s has been delayed", flightNumber)
+	case "flight/cancelled":
+		heading = fmt.Sprintf("Flight %s cancelled", flightNumber)
+		content = fmt.Sprintf("Your flight %s has been cancelled", flightNumber)
+	case "flight/gate-reassignment":
+		heading = fmt.Sprintf("Flight %s gate reassigned", flightNumber)
+		content = fmt.Sprintf("Your flight %s has a new gate assignment", flightNumber)
+	default:
+		panic(fmt.Sprintf("unknown event type: %s", eventType))
+	}
 
 	payload := utils.ConstructNotificationPayload(userIDs, heading, content)
+
+	return payload
+}
+
+func (a *App) sendPushNotification(userIDs []string, eventType, flightNumber string) {
+	payload := getNotificationPayload(userIDs, eventType, flightNumber)
+
 	if err := utils.SendNotification(payload); err != nil {
 		log.Error().AnErr("SendNotification", err).Msg("Failed to send notification")
 	}

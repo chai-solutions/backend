@@ -2,10 +2,10 @@ package utils
 
 import (
 	"bytes"
+	"chai/config"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/rs/zerolog/log"
 )
@@ -17,17 +17,10 @@ type NotificationPayload struct {
 	Contents               map[string]string `json:"contents"`
 }
 
-func GetAppID() string {
-	return os.Getenv("ONESIGNAL_APP_ID")
-}
-
-func GetAPIKey() string {
-	return os.Getenv("ONESIGNAL_API_KEY")
-}
-
 func ConstructNotificationPayload(userIDs []string, heading, content string) NotificationPayload {
+	cfg := config.GetConfig()
 	return NotificationPayload{
-		AppID:                  GetAppID(),
+		AppID:                  cfg.OneSignalAppID,
 		IncludeExternalUserIDs: userIDs,
 		Headings: map[string]string{
 			"en": heading,
@@ -39,7 +32,8 @@ func ConstructNotificationPayload(userIDs []string, heading, content string) Not
 }
 
 func SendNotification(payload NotificationPayload) error {
-	apiKey := GetAPIKey()
+	oneSignalAPIKey := config.GetConfig().OneSignalAPIKey
+
 	body, err := json.Marshal(payload)
 	if err != nil {
 		return fmt.Errorf("failed to marshal notification payload: %w", err)
@@ -52,7 +46,7 @@ func SendNotification(payload NotificationPayload) error {
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", apiKey))
+	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", oneSignalAPIKey))
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
