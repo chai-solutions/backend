@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+
+	"github.com/rs/zerolog/log"
 )
 
 type NotificationPayload struct {
@@ -45,6 +47,7 @@ func SendNotification(payload NotificationPayload) error {
 
 	req, err := http.NewRequest("POST", "https://onesignal.com/api/v1/notifications", bytes.NewBuffer(body))
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to create request")
 		return fmt.Errorf("failed to create request: %w", err)
 	}
 
@@ -54,13 +57,16 @@ func SendNotification(payload NotificationPayload) error {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
+		log.Error().Err(err).Msg("Failed to send request")
 		return fmt.Errorf("failed to send request: %w", err)
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
+		log.Error().Int("status_code", resp.StatusCode).Msg("Failed to send notification")
 		return fmt.Errorf("failed to send notification, status code: %d", resp.StatusCode)
 	}
 
+	log.Info().Msg("Notification sent successfully")
 	return nil
 }
