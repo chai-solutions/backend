@@ -2,31 +2,40 @@ package utils
 
 import (
 	"bytes"
-	"chai/config"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	"chai/config"
 
 	"github.com/rs/zerolog/log"
 )
 
 type NotificationPayload struct {
-	AppID                  string            `json:"app_id"`
-	IncludeExternalUserIDs []string          `json:"include_external_user_ids"`
-	Headings               map[string]string `json:"headings"`
-	Contents               map[string]string `json:"contents"`
+	AppID          string            `json:"app_id"`
+	TargetChannel  string            `json:"target_channel"`
+	Headings       map[string]string `json:"headings"`
+	Contents       map[string]string `json:"contents"`
+	IncludeAliases includeAliasType  `json:"include_aliases"`
+}
+
+type includeAliasType struct {
+	ExternalID []string `json:"external_id"`
 }
 
 func ConstructNotificationPayload(userIDs []string, heading, content string) NotificationPayload {
 	cfg := config.GetConfig()
 	return NotificationPayload{
-		AppID:                  cfg.OneSignalAppID,
-		IncludeExternalUserIDs: userIDs,
+		AppID:         cfg.OneSignalAppID,
+		TargetChannel: "push",
 		Headings: map[string]string{
 			"en": heading,
 		},
 		Contents: map[string]string{
 			"en": content,
+		},
+		IncludeAliases: includeAliasType{
+			ExternalID: userIDs,
 		},
 	}
 }

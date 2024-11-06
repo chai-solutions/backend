@@ -1,0 +1,29 @@
+meta {
+  name: OneSignal
+  type: http
+  seq: 17
+}
+
+post {
+  url: https://api.onesignal.com/notifications
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Basic N2YzMzcxMmItZWU4Ny00MmM1LWI1NDYtYzNhNWYyY2E1MDhk
+}
+
+body:json {
+  {
+    "app_id": "651b79b0-512f-4ecd-9f52-7803d56df515",
+    "target_channel": "push",
+    "headings": {"en": "Goodbye, cruel world!" },
+    "contents": {"en": "This is a message. Disregard." },
+    "include_aliases": {
+      "external_id": [
+        "20f3cee0-fd4d-4ad9-9c1a-741e9ec8d7cc"
+      ]
+    }
+  }
+}

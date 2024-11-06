@@ -1,10 +1,11 @@
 package server
 
 import (
-	"chai/database/sqlc"
-	"chai/utils"
 	"context"
 	"fmt"
+
+	"chai/database/sqlc"
+	"chai/utils"
 
 	"github.com/rs/zerolog/log"
 )
@@ -48,10 +49,7 @@ func (a *App) handleFlightEvent(eventType, flightNumber string) {
 
 	var userIDs []string
 	for _, row := range rows {
-		userIDs = append(userIDs, fmt.Sprintf(
-			"%s",
-			row.PublicID.Bytes,
-		))
+		userIDs = append(userIDs, utils.PGTypeUUIDToString(row.PublicID))
 	}
 
 	_, err = a.Queries.CreateNotification(context.Background(), sqlc.CreateNotificationParams{
