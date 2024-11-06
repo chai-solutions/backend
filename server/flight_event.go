@@ -1,7 +1,9 @@
 package server
 
 import (
+	"chai/database/sqlc"
 	"chai/utils"
+	"context"
 	"fmt"
 
 	"github.com/rs/zerolog/log"
@@ -18,5 +20,28 @@ func (a *App) sendPushNotification(userIDs []string, eventType, flightNumber str
 }
 
 func (a *App) handleFlightEvent(eventType, flightNumber string) {
+	rows, err := a.Queries.GetUsersByFlightNumber(context.Background(), flightNumber)
+	if err != nil {
+		log.Error().AnErr("GetUserIDsByFlightNumber", err).Msg("Failed to get user IDs and flight status")
+		return
+	}
 
+	var userIDs []string
+	for _, row := range rows {
+		userIDs = append(userIDs, fmt.Sprintf(
+			"%s",
+			row.PublicID.Bytes,
+		))
+	}
+
+	_, err = a.Queries.CreateNotification(context.Background(), sqlc.CreateNotificationParams{
+		EventType:    eventType,
+		FlightNumber: flightNumber,
+	})
+	if err != nil {
+		log.Error().AnErr("CreateNotification", err).Msg("Failed to create notification")
+		return
+	}
+
+	a.sendPushNotification(userIDs, eventType, flightNumber)
 }

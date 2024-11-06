@@ -32,6 +32,7 @@ type Flight struct {
 	SchedArrTime  pgtype.Timestamp `json:"sched_arr_time"`
 	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
 	ActualArrTime pgtype.Timestamp `json:"actual_arr_time"`
+	Status        string           `json:"status"`
 }
 
 type FlightPlan struct {
@@ -51,6 +52,13 @@ type Gate struct {
 	Latitude  float64 `json:"latitude"`
 	Longitude float64 `json:"longitude"`
 	Terminal  int32   `json:"terminal"`
+}
+
+type Notification struct {
+	ID           int32            `json:"id"`
+	EventType    string           `json:"event_type"`
+	FlightNumber string           `json:"flight_number"`
+	CreatedAt    pgtype.Timestamp `json:"created_at"`
 }
 
 type Session struct {
@@ -75,4 +83,5 @@ type User struct {
 	Name      string           `json:"name"`
 	Email     string           `json:"email"`
 	Password  string           `json:"password"`
+	PublicID  pgtype.UUID      `json:"public_id"`
 }

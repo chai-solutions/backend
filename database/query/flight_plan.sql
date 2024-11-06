@@ -77,3 +77,14 @@ RETURNING *;
 DELETE FROM flight_plan_flights
 WHERE id = @id
 RETURNING *;
+
+-- name: GetUsersByFlightNumber :many
+SELECT f.flight_number, f.status, u.public_id
+FROM USERS AS u
+JOIN flight_plans AS fp
+ON fp.id = u.id
+JOIN flight_plan_flights AS fpf
+ON fpf.flight_plan = fp.id
+JOIN flights AS f
+ON f.id = fpf.flight
+WHERE f.flight_number = @flight_number;

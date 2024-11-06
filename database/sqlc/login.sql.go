@@ -46,7 +46,7 @@ func (q *Queries) DeleteSession(ctx context.Context, token string) error {
 }
 
 const getUserFromSessionContext = `-- name: GetUserFromSessionContext :many
-SELECT u.id, u.created_at, u.name, u.email, u.password, s.token FROM sessions s
+SELECT u.id, u.created_at, u.name, u.email, u.password, u.public_id, s.token FROM sessions s
 INNER JOIN users u ON s.user_id = u.id
 WHERE token = $1
 `
@@ -57,6 +57,7 @@ type GetUserFromSessionContextRow struct {
 	Name      string           `json:"name"`
 	Email     string           `json:"email"`
 	Password  string           `json:"password"`
+	PublicID  pgtype.UUID      `json:"public_id"`
 	Token     string           `json:"token"`
 }
 
@@ -75,6 +76,7 @@ func (q *Queries) GetUserFromSessionContext(ctx context.Context, token string) (
 			&i.Name,
 			&i.Email,
 			&i.Password,
+			&i.PublicID,
 			&i.Token,
 		); err != nil {
 			return nil, err
@@ -88,7 +90,7 @@ func (q *Queries) GetUserFromSessionContext(ctx context.Context, token string) (
 }
 
 const selectAccountByEmail = `-- name: SelectAccountByEmail :many
-SELECT id, created_at, name, email, password
+SELECT id, created_at, name, email, password, public_id
 FROM users
 WHERE email = $1
 `
@@ -108,6 +110,7 @@ func (q *Queries) SelectAccountByEmail(ctx context.Context, email string) ([]Use
 			&i.Name,
 			&i.Email,
 			&i.Password,
+			&i.PublicID,
 		); err != nil {
 			return nil, err
 		}
