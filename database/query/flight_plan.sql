@@ -82,7 +82,7 @@ RETURNING *;
 SELECT f.flight_number, f.status, u.public_id
 FROM USERS AS u
 JOIN flight_plans AS fp
-ON fp.id = u.id
+ON fp.users = u.id
 JOIN flight_plan_flights AS fpf
 ON fpf.flight_plan = fp.id
 JOIN flights AS f
