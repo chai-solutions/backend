@@ -8,9 +8,11 @@ import (
 )
 
 type AppConfig struct {
-	Env         string
-	Port        int
-	DatabaseURL string
+	Env             string
+	Port            int
+	DatabaseURL     string
+	OneSignalAppID  string
+	OneSignalAPIKey string
 }
 
 func GetConfig() AppConfig {
@@ -36,9 +38,20 @@ func GetConfig() AppConfig {
 		log.Fatal().Msg("DATABASE_URL is not defined")
 	}
 
+	oneSignalAppID, found := os.LookupEnv("ONESIGNAL_APP_ID")
+	if !found {
+		log.Fatal().Msg("ONESIGNAL_APP_ID is not defined")
+	}
+	oneSignalAPIKey, found := os.LookupEnv("ONESIGNAL_API_KEY")
+	if !found {
+		log.Fatal().Msg("ONESIGNAL_APP_ID is not defined")
+	}
+
 	return AppConfig{
-		Env:         env,
-		Port:        port,
-		DatabaseURL: dbURL,
+		Env:             env,
+		Port:            port,
+		DatabaseURL:     dbURL,
+		OneSignalAppID:  oneSignalAppID,
+		OneSignalAPIKey: oneSignalAPIKey,
 	}
 }

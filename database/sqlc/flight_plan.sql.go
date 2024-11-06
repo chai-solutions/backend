@@ -199,6 +199,44 @@ func (q *Queries) GetFlightPlans(ctx context.Context, users int32) ([]GetFlightP
 	return items, nil
 }
 
+const getUsersByFlightNumber = `-- name: GetUsersByFlightNumber :many
+SELECT f.flight_number, f.status, u.public_id
+FROM USERS AS u
+JOIN flight_plans AS fp
+ON fp.id = u.id
+JOIN flight_plan_flights AS fpf
+ON fpf.flight_plan = fp.id
+JOIN flights AS f
+ON f.id = fpf.flight
+WHERE f.flight_number = $1
+`
+
+type GetUsersByFlightNumberRow struct {
+	FlightNumber string      `json:"flight_number"`
+	Status       string      `json:"status"`
+	PublicID     pgtype.UUID `json:"public_id"`
+}
+
+func (q *Queries) GetUsersByFlightNumber(ctx context.Context, flightNumber string) ([]GetUsersByFlightNumberRow, error) {
+	rows, err := q.db.Query(ctx, getUsersByFlightNumber, flightNumber)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetUsersByFlightNumberRow
+	for rows.Next() {
+		var i GetUsersByFlightNumberRow
+		if err := rows.Scan(&i.FlightNumber, &i.Status, &i.PublicID); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
 const patchFlightPlan = `-- name: PatchFlightPlan :one
 INSERT INTO flight_plan_flights (flight_plan, flight)
 SELECT fp.id, f.id
