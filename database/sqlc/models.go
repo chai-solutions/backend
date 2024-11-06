@@ -75,4 +75,5 @@ type User struct {
 	Name      string           `json:"name"`
 	Email     string           `json:"email"`
 	Password  string           `json:"password"`
+	PublicID  pgtype.UUID      `json:"public_id"`
 }
