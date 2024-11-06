@@ -38,5 +38,7 @@ func (a *App) RegisterRoutes() {
 		r.Delete("/flight_plans/{id}", a.DeleteFlightPlan)
 
 		r.Get("/maps/{iata}", a.AirportMapHandler)
+
+		r.Post("/webhook", a.WebhookHandler)
 	})
 }

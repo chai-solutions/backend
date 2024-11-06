@@ -1,0 +1,24 @@
+meta {
+  name: Push Notification
+  type: http
+  seq: 17
+}
+
+post {
+  url: http://localhost:8080/webhook
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
+
+body:json {
+  {
+    "type": "flight/delay",
+    "flight": {
+      "number": "F9272"
+    }
+  }
+}
