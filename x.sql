@@ -1,14 +1,4 @@
-DROP TABLE IF EXISTS flights;
-DROP TABLE IF EXISTS airlines;
-DROP TABLE IF EXISTS airports;
 
-CREATE TABLE IF NOT EXISTS airports (
-    id SERIAL PRIMARY KEY,
-    name TEXT NOT NULL,
-    code TEXT UNIQUE NOT NULL,
-    latitude DOUBLE PRECISION NOT NULL,
-    longitude DOUBLE PRECISION NOT NULL
-);
 INSERT INTO airports (name, iata, latitude, longitude) VALUES ('John F. Kennedy International Airport', 'JFK', 40.6413, -73.7781);
 INSERT INTO airports (name, iata, latitude, longitude) VALUES ('Los Angeles International Airport', 'LAX', 33.9416, -118.4085);
 INSERT INTO airports (name, iata, latitude, longitude) VALUES ('O Hare International Airport', 'ORD', 41.9742, -87.9073);

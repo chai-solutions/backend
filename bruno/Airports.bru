@@ -17,3 +17,22 @@ params:query {
 headers {
   Authorization: Bearer {{token}}
 }
+
+tests {
+  test("should return a list of airports", function() {
+    const data = res.getBody();
+    expect(res.getStatus()).to.equal(200);
+  });
+  
+  test("should contain airports with valid IATA codes, names, and coordinates", function() {
+    const data = res.getBody();
+    expect(data).to.be.an('array');
+    
+    data.forEach(function(airport) {
+      expect(airport.iata).to.be.a('string');
+      expect(airport.name).to.be.a('string');
+      expect(airport.latitude).to.be.a('number');
+      expect(airport.longitude).to.be.a('number');
+    });
+  });
+}

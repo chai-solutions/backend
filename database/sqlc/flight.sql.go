@@ -12,21 +12,22 @@ import (
 )
 
 const getFlight = `-- name: GetFlight :one
-SELECT 
-    f.id, f.flight_number, 
-    f.sched_dep_time, 
-    f.actual_arr_time, 
+SELECT
+    f.id,
+    f.flight_number,
+    f.sched_dep_time,
+    f.actual_arr_time,
     f.actual_dep_time,
-    d.iata AS dep_iata, 
-    a.iata AS arrival_iata, 
+    d.iata AS dep_iata,
+    a.iata AS arrival_iata,
     d.name AS dep_name,
     a.name AS arrival_name
-FROM flights AS f
-INNER JOIN airports AS d
-    ON d.id = f.dep_airport
-INNER JOIN airports AS a
-    ON a.id = f.arr_airport
-WHERE f.flight_number = $1
+FROM
+    flights AS f
+    INNER JOIN airports AS d ON d.id = f.dep_airport
+    INNER JOIN airports AS a ON a.id = f.arr_airport
+WHERE
+    f.flight_number = $1
 `
 
 type GetFlightRow struct {
@@ -59,17 +60,23 @@ func (q *Queries) GetFlight(ctx context.Context, flightNumber string) (GetFlight
 }
 
 const getFlights = `-- name: GetFlights :many
-SELECT 
-    f.id, f.flight_number, f.sched_dep_time, f.actual_arr_time, f.actual_dep_time,
-    a.iata AS arrival_iata, a.name AS arrival_name,
-    d.iata AS dep_iata, d.name AS dep_name
-FROM flights AS f
-INNER JOIN airports AS d
-    ON d.id = f.dep_airport
-INNER JOIN airports AS a
-    ON a.id = f.arr_airport
-WHERE d.iata = $1
-AND a.iata = $2
+SELECT
+    f.id,
+    f.flight_number,
+    f.sched_dep_time,
+    f.actual_arr_time,
+    f.actual_dep_time,
+    a.iata AS arrival_iata,
+    a.name AS arrival_name,
+    d.iata AS dep_iata,
+    d.name AS dep_name
+FROM
+    flights AS f
+    INNER JOIN airports AS d ON d.id = f.dep_airport
+    INNER JOIN airports AS a ON a.id = f.arr_airport
+WHERE
+    d.iata = $1
+    AND a.iata = $2
 `
 
 type GetFlightsParams struct {
@@ -108,6 +115,72 @@ func (q *Queries) GetFlights(ctx context.Context, arg GetFlightsParams) ([]GetFl
 			&i.ArrivalName,
 			&i.DepIata,
 			&i.DepName,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
+}
+
+const getTwoFlights = `-- name: GetTwoFlights :many
+SELECT
+    f.id,
+    f.flight_number,
+    f.sched_dep_time,
+    f.actual_arr_time,
+    f.actual_dep_time,
+    d.iata AS dep_iata,
+    a.iata AS arrival_iata,
+    d.name AS dep_name,
+    a.name AS arrival_name
+FROM
+    flights AS f
+    INNER JOIN airports AS d ON d.id = f.dep_airport
+    INNER JOIN airports AS a ON a.id = f.arr_airport
+WHERE
+    f.flight_number IN ($1, $2)
+`
+
+type GetTwoFlightsParams struct {
+	FlightNumber1 string `json:"flight_number1"`
+	FlightNumber2 string `json:"flight_number2"`
+}
+
+type GetTwoFlightsRow struct {
+	ID            int32            `json:"id"`
+	FlightNumber  string           `json:"flight_number"`
+	SchedDepTime  pgtype.Timestamp `json:"sched_dep_time"`
+	ActualArrTime pgtype.Timestamp `json:"actual_arr_time"`
+	ActualDepTime pgtype.Timestamp `json:"actual_dep_time"`
+	DepIata       string           `json:"dep_iata"`
+	ArrivalIata   string           `json:"arrival_iata"`
+	DepName       string           `json:"dep_name"`
+	ArrivalName   string           `json:"arrival_name"`
+}
+
+func (q *Queries) GetTwoFlights(ctx context.Context, arg GetTwoFlightsParams) ([]GetTwoFlightsRow, error) {
+	rows, err := q.db.Query(ctx, getTwoFlights, arg.FlightNumber1, arg.FlightNumber2)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []GetTwoFlightsRow
+	for rows.Next() {
+		var i GetTwoFlightsRow
+		if err := rows.Scan(
+			&i.ID,
+			&i.FlightNumber,
+			&i.SchedDepTime,
+			&i.ActualArrTime,
+			&i.ActualDepTime,
+			&i.DepIata,
+			&i.ArrivalIata,
+			&i.DepName,
+			&i.ArrivalName,
 		); err != nil {
 			return nil, err
 		}

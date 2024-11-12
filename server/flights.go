@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 )
@@ -55,4 +56,43 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+}
+
+// parameters: Flight numbers for 2 different flights
+func (a *App) TimeDiff(firstFlightNum, secondFlightNum string) (time.Duration, error) {
+	//parameter for query
+	var flightsQueryParam sqlc.GetTwoFlightsParams
+
+	flightsQueryParam.FlightNumber1 = firstFlightNum
+	flightsQueryParam.FlightNumber2 = secondFlightNum
+
+	//storage for query response
+	var flightsArray []sqlc.GetTwoFlightsRow
+
+	flightsArray, err := a.Queries.GetTwoFlights(context.Background(), flightsQueryParam)
+	if err != nil {
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		return 0, err
+	}
+
+	//get arrival times for flights
+	firstFlightArr := flightsArray[0].ActualArrTime.Time
+	secondFlightArr := flightsArray[1].ActualArrTime.Time
+
+	//if secondFlight comes first, swap flights for readability
+	if firstFlightArr.Compare(secondFlightArr) == 1 {
+		flightsArray[0], flightsArray[1] = flightsArray[0], flightsArray[1]
+		//swap arrival time variables
+		firstFlightArr = flightsArray[0].ActualArrTime.Time
+		secondFlightArr = flightsArray[1].ActualArrTime.Time
+	}
+
+	firstFlightDep := flightsArray[0].ActualDepTime.Time
+
+	//find layover between first and second flight
+	var diff time.Duration
+	//find difference between times
+	diff = secondFlightArr.Sub(firstFlightDep)
+
+	return diff, nil
 }
