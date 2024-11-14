@@ -19,9 +19,6 @@ func TestNewApp(t *testing.T) {
 
 	app := NewApp(cfg, db, queries)
 
-	if app == nil {
-		t.Errorf("app is nil 😳")
-	}
 	if cfg != app.Config {
 		t.Errorf("😿")
 	}
@@ -83,7 +80,7 @@ func TestWaitForShutdown(t *testing.T) {
 	go func() {
 		sig := <-quit
 		if os.Interrupt != sig {
-			t.Errorf("Wrong interupt")
+			t.Errorf("Wrong interrupt")
 		}
 	}()
 
