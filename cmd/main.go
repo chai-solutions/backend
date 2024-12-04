@@ -34,10 +34,10 @@ func main() {
 
 	log.Info().Str("env", cfg.Env).Send()
 
-	db, queries := database.NewPool(cfg.DatabaseURL)
+	_, queries := database.NewPool(cfg.DatabaseURL)
 
 	database.RunMigrations(cfg.DatabaseURL)
-	server := server.NewApp(cfg, db, queries)
+	server := server.NewApp(cfg, queries)
 	server.RegisterRoutes()
 
 	server.Start()
