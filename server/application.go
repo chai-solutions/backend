@@ -10,20 +10,21 @@ import (
 	"time"
 
 	"chai/config"
-	"chai/database/sqlc"
+	"chai/repos"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
 )
 
 type App struct {
-	Config  config.AppConfig
-	Router  *chi.Mux
-	Server  *http.Server
-	Queries *sqlc.Queries
+	Config config.AppConfig
+	Router *chi.Mux
+	Server *http.Server
+
+	UserRepo repos.UserRepository
 }
 
-func NewApp(cfg config.AppConfig, queries *sqlc.Queries) *App {
+func NewApp(cfg config.AppConfig, userRepo repos.UserRepository) *App {
 	mux := chi.NewMux()
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
@@ -37,10 +38,11 @@ func NewApp(cfg config.AppConfig, queries *sqlc.Queries) *App {
 	}
 
 	return &App{
-		Config:  cfg,
-		Router:  mux,
-		Server:  &s,
-		Queries: queries,
+		Config: cfg,
+		Router: mux,
+		Server: &s,
+
+		UserRepo: userRepo,
 	}
 }
 

@@ -6,6 +6,7 @@ import (
 
 	"chai/config"
 	"chai/database"
+	"chai/repos"
 	"chai/server"
 
 	"github.com/rs/zerolog"
@@ -36,8 +37,10 @@ func main() {
 
 	_, queries := database.NewPool(cfg.DatabaseURL)
 
+	userRepo := repos.NewUserRepository(queries)
+
 	database.RunMigrations(cfg.DatabaseURL)
-	server := server.NewApp(cfg, queries)
+	server := server.NewApp(cfg, userRepo)
 	server.RegisterRoutes()
 
 	server.Start()
