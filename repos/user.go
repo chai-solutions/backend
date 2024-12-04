@@ -11,6 +11,7 @@ import (
 type UserRepository interface {
 	CreateUser(username string, email string, password string) error
 	GetUserByEmail(email string) (*sqlc.User, error)
+	GetUserByID(userID int32) (*sqlc.User, error)
 }
 
 type userRepositoryImpl struct {
@@ -47,4 +48,13 @@ func (r *userRepositoryImpl) GetUserByEmail(email string) (*sqlc.User, error) {
 	}
 
 	return &users[0], nil
+}
+
+func (r *userRepositoryImpl) GetUserByID(userID int32) (*sqlc.User, error) {
+	user, err := r.db.SelectUserByID(context.Background(), userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
 }

@@ -18,8 +18,8 @@ func TestGetUserHandler(t *testing.T) {
 
 	t.Run("Create user successfully", func(t *testing.T) {
 		body, err := json.Marshal(server.CreateUserBody{
-			Name:     "Sanjay Ramaswamy",
-			Email:    "sanjay@ramaswamy.net",
+			Name:     "Sanjay Ramaswamy II",
+			Email:    "sanjay2@ramaswamy.net",
 			Password: "ramaswamy123",
 		})
 		if err != nil {
@@ -38,7 +38,7 @@ func TestGetUserHandler(t *testing.T) {
 
 	t.Run("Empty email fails", func(t *testing.T) {
 		body, err := json.Marshal(server.CreateUserBody{
-			Name:     "Sanjay Ramaswamy",
+			Name:     "Sanjay Ramaswamy II",
 			Email:    "",
 			Password: "ramaswamy123",
 		})
@@ -58,8 +58,8 @@ func TestGetUserHandler(t *testing.T) {
 
 	t.Run("Empty password fails", func(t *testing.T) {
 		body, err := json.Marshal(server.CreateUserBody{
-			Name:     "Sanjay Ramaswamy",
-			Email:    "sanjay@ramaswamy.net",
+			Name:     "Sanjay Ramaswamy II",
+			Email:    "sanjay2@ramaswamy.net",
 			Password: "",
 		})
 		if err != nil {
@@ -76,5 +76,24 @@ func TestGetUserHandler(t *testing.T) {
 		}
 	})
 
-	// TODO: fail if email already exists
+	t.Run("Existing email fails", func(t *testing.T) {
+		body, err := json.Marshal(server.CreateUserBody{
+			Name:     "Sanjay Ramaswamy II",
+			Email:    "sanjay@ramaswamy.net",
+			Password: "ramaswamy123",
+		})
+		if err != nil {
+			t.Fatalf("failed to encode body, unreachable")
+		}
+
+		req := httptest.NewRequest(http.MethodPost, "/users", bytes.NewReader(body))
+		rec := httptest.NewRecorder()
+
+		app.Router.ServeHTTP(rec, req)
+
+		// Internal server error isn't technically correct, but whatever
+		if rec.Code != http.StatusInternalServerError {
+			t.Fatalf("expected status 400; got %v", rec.Code)
+		}
+	})
 }

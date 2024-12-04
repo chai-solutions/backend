@@ -38,9 +38,10 @@ func main() {
 	_, queries := database.NewPool(cfg.DatabaseURL)
 
 	userRepo := repos.NewUserRepository(queries)
+	sessionRepo := repos.NewSessionRepository(queries)
 
 	database.RunMigrations(cfg.DatabaseURL)
-	server := server.NewApp(cfg, userRepo)
+	server := server.NewApp(cfg, userRepo, sessionRepo)
 	server.RegisterRoutes()
 
 	server.Start()

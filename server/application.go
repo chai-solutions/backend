@@ -21,10 +21,11 @@ type App struct {
 	Router *chi.Mux
 	Server *http.Server
 
-	UserRepo repos.UserRepository
+	UserRepo    repos.UserRepository
+	SessionRepo repos.SessionRepository
 }
 
-func NewApp(cfg config.AppConfig, userRepo repos.UserRepository) *App {
+func NewApp(cfg config.AppConfig, userRepo repos.UserRepository, sessionRepo repos.SessionRepository) *App {
 	mux := chi.NewMux()
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
@@ -42,7 +43,8 @@ func NewApp(cfg config.AppConfig, userRepo repos.UserRepository) *App {
 		Router: mux,
 		Server: &s,
 
-		UserRepo: userRepo,
+		UserRepo:    userRepo,
+		SessionRepo: sessionRepo,
 	}
 }
 
