@@ -1,16 +1,17 @@
 package server_test
 
 import (
-	// "encoding/json"
 	"bytes"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 
-	// "chai/database/sqlc"
+	"chai/database/sqlc"
 	"chai/server"
 	"chai/server/mocks"
+
+	"github.com/rs/zerolog/log"
 )
 
 func TestGetUserHandler(t *testing.T) {
@@ -96,4 +97,44 @@ func TestGetUserHandler(t *testing.T) {
 			t.Fatalf("expected status 400; got %v", rec.Code)
 		}
 	})
+}
+
+func GetCurrentUserHandler(t *testing.T) {
+	app := mocks.InitializeMockApp()
+
+	token, err := app.SessionRepo.AddSession(3)
+	if err != nil {
+		t.Fatalf("failed to generate token")
+	}
+
+	defer func() {
+		err = app.SessionRepo.DeleteSession(token)
+		if err != nil {
+			log.Warn().Msg("failed to remove session in test")
+		}
+	}()
+
+	req := httptest.NewRequest(http.MethodGet, "/users/@me", nil)
+	rec := httptest.NewRecorder()
+	req.Header.Add("Authorization", "Bearer "+token)
+
+	app.Router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusOK {
+		t.Fatalf("expected status 200; got %v", rec.Code)
+	}
+
+	body := rec.Result().Body
+	defer body.Close()
+
+	var result sqlc.GetUserFromSessionContextRow
+	err = json.NewDecoder(body).Decode(&result)
+	if err != nil {
+		t.Fatalf("failed to deserialize user body")
+	}
+
+	// A basic sanity check for checking if the user is expected
+	if result.Token != token {
+		t.Fatalf("user token does not match in result")
+	}
 }

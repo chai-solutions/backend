@@ -1,6 +1,5 @@
 package server
 
-//
 // import (
 // 	"context"
 // 	"encoding/json"
@@ -8,12 +7,6 @@ package server
 //
 // 	"github.com/rs/zerolog/log"
 // )
-//
-// const OverpassAPIURL = "http://overpass-api.de/api/interpreter"
-//
-// type MapResponse struct {
-// 	MapURL string `json:"map_url"`
-// }
 //
 // func (a *App) AirportsHandler(w http.ResponseWriter, _ *http.Request) {
 // 	airports, err := a.Queries.GetAllAirports(context.Background())
