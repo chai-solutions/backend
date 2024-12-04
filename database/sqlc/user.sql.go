@@ -35,3 +35,22 @@ func (q *Queries) CreateAccount(ctx context.Context, arg CreateAccountParams) (C
 	err := row.Scan(&i.Name, &i.Email, &i.CreatedAt)
 	return i, err
 }
+
+const selectUserByID = `-- name: SelectUserByID :one
+SELECT id, created_at, name, email, password, public_id FROM users u
+WHERE u.id = $1
+`
+
+func (q *Queries) SelectUserByID(ctx context.Context, id int32) (User, error) {
+	row := q.db.QueryRow(ctx, selectUserByID, id)
+	var i User
+	err := row.Scan(
+		&i.ID,
+		&i.CreatedAt,
+		&i.Name,
+		&i.Email,
+		&i.Password,
+		&i.PublicID,
+	)
+	return i, err
+}

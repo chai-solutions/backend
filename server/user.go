@@ -3,7 +3,8 @@ package server
 import (
 	"encoding/json"
 	"net/http"
-	// "chai/middleware"
+
+	"chai/middleware"
 )
 
 type CreateUserBody struct {
@@ -40,9 +41,9 @@ func (a *App) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// func (a *App) UserInfoHandler(w http.ResponseWriter, r *http.Request) {
-// 	user := middleware.MustGetUserFromContext(r.Context())
-//
-// 	err := json.NewEncoder(w).Encode(user)
-// 	_ = err
-// }
+func (a *App) UserInfoHandler(w http.ResponseWriter, r *http.Request) {
+	user := middleware.MustGetUserFromContext(r.Context())
+
+	err := json.NewEncoder(w).Encode(user)
+	_ = err
+}

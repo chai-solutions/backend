@@ -17,13 +17,13 @@ func (a *App) RegisterRoutes() {
 	r.Get("/hello", a.HelloHandler)
 	r.Post("/users", a.CreateUserHandler)
 
-	// r.Post("/login", a.LoginHandler)
+	r.Post("/login", a.LoginHandler)
 
 	r.Group(func(r chi.Router) {
-		// r.Use(middleware.APIAuthorization(a.Queries))
+		r.Use(middleware.APIAuthorization(a.SessionRepo))
 
-		// r.Get("/users/@me", a.UserInfoHandler)
-		// r.Delete("/logout", a.LogoutHandler)
+		r.Get("/users/@me", a.UserInfoHandler)
+		r.Delete("/logout", a.LogoutHandler)
 
 		// r.Get("/airports", a.AirportsHandler)
 		//
