@@ -39,9 +39,14 @@ func main() {
 
 	userRepo := repos.NewUserRepository(queries)
 	sessionRepo := repos.NewSessionRepository(queries)
+	airportsRepo := repos.NewAirportsRepository(queries)
 
 	database.RunMigrations(cfg.DatabaseURL)
-	server := server.NewApp(cfg, userRepo, sessionRepo)
+	server := server.NewApp(cfg, server.Repositories{
+		UserRepo:     userRepo,
+		SessionRepo:  sessionRepo,
+		AirportsRepo: airportsRepo,
+	})
 	server.RegisterRoutes()
 
 	server.Start()
