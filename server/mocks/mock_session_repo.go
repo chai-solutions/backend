@@ -70,11 +70,6 @@ func (m *MockSessionRepository) GetUserFromSessionContext(token string) (*sqlc.G
 		return nil, errors.New("session not found")
 	}
 
-	user, err := m.GetUserFromSessionContext(token)
-	if err != nil || user == nil {
-		return nil, errors.New("user not found")
-	}
-
 	return &session, nil
 }
 
