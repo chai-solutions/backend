@@ -9,6 +9,7 @@ func InitializeMockApp() *server.App {
 	mockUserRepo := NewMockUserRepository()
 	mockSessionRepo := NewMockSessionRepository(mockUserRepo)
 	mockAirportsRepo := NewMockAirportsRepository()
+	mockFlightsRepo := NewMockFlightsRepository(mockAirportsRepo)
 
 	err := mockUserRepo.CreateUser(
 		"test@example.com",
@@ -25,6 +26,7 @@ func InitializeMockApp() *server.App {
 		UserRepo:     mockUserRepo,
 		SessionRepo:  mockSessionRepo,
 		AirportsRepo: mockAirportsRepo,
+		FlightsRepo:  mockFlightsRepo,
 	})
 	app.RegisterRoutes()
 

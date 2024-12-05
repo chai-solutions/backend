@@ -9,14 +9,33 @@ import (
 	"context"
 )
 
-const getAirport = `-- name: GetAirport :one
-SELECT a.id, a.iata, a.name, a.latitude, a.longitude
+const getAirportByIATACode = `-- name: GetAirportByIATACode :one
+SELECT id, iata, name, latitude, longitude
 FROM airports AS a
 WHERE a.iata = $1
 `
 
-func (q *Queries) GetAirport(ctx context.Context, iata string) (Airport, error) {
-	row := q.db.QueryRow(ctx, getAirport, iata)
+func (q *Queries) GetAirportByIATACode(ctx context.Context, iata string) (Airport, error) {
+	row := q.db.QueryRow(ctx, getAirportByIATACode, iata)
+	var i Airport
+	err := row.Scan(
+		&i.ID,
+		&i.Iata,
+		&i.Name,
+		&i.Latitude,
+		&i.Longitude,
+	)
+	return i, err
+}
+
+const getAirportByID = `-- name: GetAirportByID :one
+SELECT id, iata, name, latitude, longitude
+FROM airports AS a
+WHERE a.id = $1
+`
+
+func (q *Queries) GetAirportByID(ctx context.Context, id int32) (Airport, error) {
+	row := q.db.QueryRow(ctx, getAirportByID, id)
 	var i Airport
 	err := row.Scan(
 		&i.ID,
