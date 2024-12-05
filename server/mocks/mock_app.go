@@ -8,6 +8,7 @@ import (
 func InitializeMockApp() *server.App {
 	mockUserRepo := NewMockUserRepository()
 	mockSessionRepo := NewMockSessionRepository(mockUserRepo)
+	mockAirportsRepo := NewMockAirportsRepository()
 
 	err := mockUserRepo.CreateUser(
 		"test@example.com",
@@ -20,7 +21,11 @@ func InitializeMockApp() *server.App {
 
 	cfg := config.AppConfig{}
 
-	app := server.NewApp(cfg, mockUserRepo, mockSessionRepo)
+	app := server.NewApp(cfg, server.Repositories{
+		UserRepo:     mockUserRepo,
+		SessionRepo:  mockSessionRepo,
+		AirportsRepo: mockAirportsRepo,
+	})
 	app.RegisterRoutes()
 
 	return app
