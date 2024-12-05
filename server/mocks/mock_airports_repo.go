@@ -47,3 +47,14 @@ func (m *MockAirportsRepository) GetAll() ([]sqlc.Airport, error) {
 
 	return airports, nil
 }
+
+func (m *MockAirportsRepository) GetByID(id int32) (*sqlc.Airport, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if airport, exists := m.Airports[id]; exists {
+		return &airport, nil
+	}
+
+	return nil, nil
+}

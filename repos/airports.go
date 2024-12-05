@@ -8,6 +8,7 @@ import (
 
 type AirportsRepository interface {
 	GetAll() ([]sqlc.Airport, error)
+	GetByID(id int32) (*sqlc.Airport, error)
 }
 
 type airportsRepositoryImpl struct {
@@ -25,4 +26,13 @@ func (r *airportsRepositoryImpl) GetAll() ([]sqlc.Airport, error) {
 	}
 
 	return airports, nil
+}
+
+func (r *airportsRepositoryImpl) GetByID(id int32) (*sqlc.Airport, error) {
+	airport, err := r.db.GetAirportByID(context.Background(), id)
+	if err != nil {
+		return nil, err
+	}
+
+	return &airport, nil
 }

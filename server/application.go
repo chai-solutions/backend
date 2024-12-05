@@ -24,12 +24,14 @@ type App struct {
 	UserRepo     repos.UserRepository
 	SessionRepo  repos.SessionRepository
 	AirportsRepo repos.AirportsRepository
+	FlightsRepo  repos.FlightsRepository
 }
 
 type Repositories struct {
 	UserRepo     repos.UserRepository
 	SessionRepo  repos.SessionRepository
 	AirportsRepo repos.AirportsRepository
+	FlightsRepo  repos.FlightsRepository
 }
 
 func NewApp(cfg config.AppConfig, repos Repositories) *App {
@@ -53,6 +55,7 @@ func NewApp(cfg config.AppConfig, repos Repositories) *App {
 		UserRepo:     repos.UserRepo,
 		SessionRepo:  repos.SessionRepo,
 		AirportsRepo: repos.AirportsRepo,
+		FlightsRepo:  repos.FlightsRepo,
 	}
 }
 

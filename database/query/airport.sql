@@ -2,8 +2,12 @@
 SELECT *
 FROM airports;
 
--- name: GetAirport :one
-SELECT a.id, a.iata, a.name, a.latitude, a.longitude
+-- name: GetAirportByIATACode :one
+SELECT *
 FROM airports AS a
-WHERE a.iata = @iata
-;
+WHERE a.iata = @iata;
+
+-- name: GetAirportByID :one
+SELECT *
+FROM airports AS a
+WHERE a.id = @id;
