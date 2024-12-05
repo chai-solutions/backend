@@ -102,7 +102,7 @@ func TestGetUserHandler(t *testing.T) {
 func GetCurrentUserHandler(t *testing.T) {
 	app := mocks.InitializeMockApp()
 
-	token, err := app.SessionRepo.AddSession(3)
+	token, err := app.SessionRepo.AddSession(1)
 	if err != nil {
 		t.Fatalf("failed to generate token")
 	}

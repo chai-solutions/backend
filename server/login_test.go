@@ -9,6 +9,8 @@ import (
 
 	"chai/server"
 	"chai/server/mocks"
+
+	"github.com/rs/zerolog/log"
 )
 
 func TestLoginHandlers(t *testing.T) {
@@ -72,4 +74,30 @@ func TestLoginHandlers(t *testing.T) {
 			t.Fatalf("expected status OK; got %v", rec.Code)
 		}
 	})
+}
+
+func TestLogoutHandlers(t *testing.T) {
+	app := mocks.InitializeMockApp()
+
+	token, err := app.SessionRepo.AddSession(1)
+	if err != nil {
+		t.Fatalf("failed to generate token")
+	}
+
+	defer func() {
+		err = app.SessionRepo.DeleteSession(token)
+		if err != nil {
+			log.Warn().Msg("failed to remove session in test")
+		}
+	}()
+
+	req := httptest.NewRequest(http.MethodDelete, "/logout", nil)
+	rec := httptest.NewRecorder()
+	req.Header.Add("Authorization", "Bearer "+token)
+
+	app.Router.ServeHTTP(rec, req)
+
+	if rec.Code != http.StatusNoContent {
+		t.Fatalf("expected status 204; got %v", rec.Code)
+	}
 }
