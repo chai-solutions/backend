@@ -13,15 +13,21 @@ import (
 
 const createFlightPlan = `-- name: CreateFlightPlan :one
 WITH new_flight_plan AS (
-    INSERT INTO flight_plans (users)
-    VALUES ($2)
-    RETURNING id
+    INSERT INTO
+        flight_plans (users)
+    VALUES
+        ($2) RETURNING id
 )
-INSERT INTO flight_plan_flights (flight_plan, flight)
-SELECT new_flight_plan.id, f.id
-FROM flights AS f, new_flight_plan
-WHERE f.flight_number = $1
-RETURNING flight_plan_flights.id, flight_plan_flights.flight_plan, flight_plan_flights.flight
+INSERT INTO
+    flight_plan_flights (flight_plan, flight)
+SELECT
+    new_flight_plan.id,
+    f.id
+FROM
+    flights AS f,
+    new_flight_plan
+WHERE
+    f.flight_number = $1 RETURNING flight_plan_flights.id, flight_plan_flights.flight_plan, flight_plan_flights.flight
 `
 
 type CreateFlightPlanParams struct {
@@ -37,9 +43,10 @@ func (q *Queries) CreateFlightPlan(ctx context.Context, arg CreateFlightPlanPara
 }
 
 const deleteFlightPlan = `-- name: DeleteFlightPlan :exec
-DELETE FROM flight_plans
-WHERE id = $1
-RETURNING id, users
+DELETE FROM
+    flight_plans
+WHERE
+    id = $1 RETURNING id, users
 `
 
 func (q *Queries) DeleteFlightPlan(ctx context.Context, id int32) error {
@@ -48,9 +55,10 @@ func (q *Queries) DeleteFlightPlan(ctx context.Context, id int32) error {
 }
 
 const deleteFlightPlanStep = `-- name: DeleteFlightPlanStep :exec
-DELETE FROM flight_plan_flights
-WHERE id = $1
-RETURNING id, flight_plan, flight
+DELETE FROM
+    flight_plan_flights
+WHERE
+    id = $1 RETURNING id, flight_plan, flight
 `
 
 func (q *Queries) DeleteFlightPlanStep(ctx context.Context, id int32) error {
@@ -59,8 +67,8 @@ func (q *Queries) DeleteFlightPlanStep(ctx context.Context, id int32) error {
 }
 
 const getFlightPlan = `-- name: GetFlightPlan :many
-SELECT 
-    fp.id,
+SELECT
+    fpf.id,
     f.flight_number,
     departure_airport.name AS dep_airport_name,
     arrival_airport.name AS arr_airport_name,
@@ -70,16 +78,15 @@ SELECT
     f.sched_arr_time,
     f.actual_dep_time,
     f.actual_arr_time
-FROM flight_plans AS fp
-JOIN flight_plan_flights AS fpf
-ON fp.id = fpf.flight_plan
-JOIN flights AS f
-ON fpf.flight = f.id
-JOIN airports AS departure_airport
-ON f.dep_airport = departure_airport.id
-JOIN airports AS arrival_airport
-ON f.arr_airport = arrival_airport.id
-WHERE fp.users = $1 AND fp.id = $2
+FROM
+    flight_plans AS fp
+    JOIN flight_plan_flights AS fpf ON fp.id = fpf.flight_plan
+    JOIN flights AS f ON fpf.flight = f.id
+    JOIN airports AS departure_airport ON f.dep_airport = departure_airport.id
+    JOIN airports AS arrival_airport ON f.arr_airport = arrival_airport.id
+WHERE
+    fp.users = $1
+    AND fp.id = $2
 `
 
 type GetFlightPlanParams struct {
@@ -132,7 +139,7 @@ func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) ([
 }
 
 const getFlightPlans = `-- name: GetFlightPlans :many
-SELECT 
+SELECT
     flight_plans.id AS flight_plan_id,
     flights.flight_number,
     dep_airport.name AS dep_airport,
@@ -143,16 +150,14 @@ SELECT
     flights.sched_arr_time,
     flights.actual_dep_time,
     flights.actual_arr_time
-FROM flight_plans
-JOIN flight_plan_flights 
-ON flight_plans.id = flight_plan_flights.flight_plan
-JOIN flights 
-ON flight_plan_flights.flight = flights.id
-JOIN airports AS dep_airport 
-ON flights.dep_airport = dep_airport.id
-JOIN airports AS arr_airport 
-ON flights.arr_airport = arr_airport.id
-WHERE flight_plans.users = $1
+FROM
+    flight_plans
+    JOIN flight_plan_flights ON flight_plans.id = flight_plan_flights.flight_plan
+    JOIN flights ON flight_plan_flights.flight = flights.id
+    JOIN airports AS dep_airport ON flights.dep_airport = dep_airport.id
+    JOIN airports AS arr_airport ON flights.arr_airport = arr_airport.id
+WHERE
+    flight_plans.users = $1
 `
 
 type GetFlightPlansRow struct {
@@ -200,15 +205,17 @@ func (q *Queries) GetFlightPlans(ctx context.Context, users int32) ([]GetFlightP
 }
 
 const getUsersByFlightNumber = `-- name: GetUsersByFlightNumber :many
-SELECT f.flight_number, f.status, u.public_id
-FROM USERS AS u
-JOIN flight_plans AS fp
-ON fp.users = u.id
-JOIN flight_plan_flights AS fpf
-ON fpf.flight_plan = fp.id
-JOIN flights AS f
-ON f.id = fpf.flight
-WHERE f.flight_number = $1
+SELECT
+    f.flight_number,
+    f.status,
+    u.public_id
+FROM
+    USERS AS u
+    JOIN flight_plans AS fp ON fp.users = u.id
+    JOIN flight_plan_flights AS fpf ON fpf.flight_plan = fp.id
+    JOIN flights AS f ON f.id = fpf.flight
+WHERE
+    f.flight_number = $1
 `
 
 type GetUsersByFlightNumberRow struct {
@@ -238,12 +245,16 @@ func (q *Queries) GetUsersByFlightNumber(ctx context.Context, flightNumber strin
 }
 
 const patchFlightPlan = `-- name: PatchFlightPlan :one
-INSERT INTO flight_plan_flights (flight_plan, flight)
-SELECT fp.id, f.id
-FROM flight_plans AS fp
-JOIN flights AS f ON f.flight_number = $1
-WHERE fp.id = $2
-RETURNING flight_plan_flights.id, flight_plan_flights.flight_plan, flight_plan_flights.flight
+INSERT INTO
+    flight_plan_flights (flight_plan, flight)
+SELECT
+    fp.id,
+    f.id
+FROM
+    flight_plans AS fp
+    JOIN flights AS f ON f.flight_number = $1
+WHERE
+    fp.id = $2 RETURNING flight_plan_flights.id, flight_plan_flights.flight_plan, flight_plan_flights.flight
 `
 
 type PatchFlightPlanParams struct {
