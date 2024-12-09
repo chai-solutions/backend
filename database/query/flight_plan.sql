@@ -31,6 +31,7 @@ WHERE
 -- name: GetFlightPlans :many
 SELECT
     flight_plans.id AS flight_plan_id,
+    flight_plan_flights.id AS indv_flight_id,
     flights.flight_number,
     dep_airport.name AS dep_airport,
     arr_airport.name AS arr_airport,

@@ -141,6 +141,7 @@ func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) ([
 const getFlightPlans = `-- name: GetFlightPlans :many
 SELECT
     flight_plans.id AS flight_plan_id,
+    flight_plan_flights.id AS indv_flight_id,
     flights.flight_number,
     dep_airport.name AS dep_airport,
     arr_airport.name AS arr_airport,
@@ -162,6 +163,7 @@ WHERE
 
 type GetFlightPlansRow struct {
 	FlightPlanID  int32            `json:"flight_plan_id"`
+	IndvFlightID  int32            `json:"indv_flight_id"`
 	FlightNumber  string           `json:"flight_number"`
 	DepAirport    string           `json:"dep_airport"`
 	ArrAirport    string           `json:"arr_airport"`
@@ -184,6 +186,7 @@ func (q *Queries) GetFlightPlans(ctx context.Context, users int32) ([]GetFlightP
 		var i GetFlightPlansRow
 		if err := rows.Scan(
 			&i.FlightPlanID,
+			&i.IndvFlightID,
 			&i.FlightNumber,
 			&i.DepAirport,
 			&i.ArrAirport,
