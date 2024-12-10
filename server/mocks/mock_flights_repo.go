@@ -108,3 +108,8 @@ func (m *MockFlightsRepository) FlightsByDepartureArrival(departureCode string, 
 
 	return flights, nil
 }
+
+func (m *MockFlightsRepository) UsersOnFlight(flightNumber string) ([]sqlc.GetUsersByFlightNumberRow, error) {
+	_ = flightNumber
+	panic("unimplemented")
+}

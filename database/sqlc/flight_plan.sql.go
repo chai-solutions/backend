@@ -211,7 +211,8 @@ const getUsersByFlightNumber = `-- name: GetUsersByFlightNumber :many
 SELECT
     f.flight_number,
     f.status,
-    u.public_id
+    u.public_id,
+    u.id AS user_id
 FROM
     USERS AS u
     JOIN flight_plans AS fp ON fp.users = u.id
@@ -225,6 +226,7 @@ type GetUsersByFlightNumberRow struct {
 	FlightNumber string      `json:"flight_number"`
 	Status       string      `json:"status"`
 	PublicID     pgtype.UUID `json:"public_id"`
+	UserID       int32       `json:"user_id"`
 }
 
 func (q *Queries) GetUsersByFlightNumber(ctx context.Context, flightNumber string) ([]GetUsersByFlightNumberRow, error) {
@@ -236,7 +238,12 @@ func (q *Queries) GetUsersByFlightNumber(ctx context.Context, flightNumber strin
 	var items []GetUsersByFlightNumberRow
 	for rows.Next() {
 		var i GetUsersByFlightNumberRow
-		if err := rows.Scan(&i.FlightNumber, &i.Status, &i.PublicID); err != nil {
+		if err := rows.Scan(
+			&i.FlightNumber,
+			&i.Status,
+			&i.PublicID,
+			&i.UserID,
+		); err != nil {
 			return nil, err
 		}
 		items = append(items, i)

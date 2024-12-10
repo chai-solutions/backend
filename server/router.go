@@ -37,6 +37,6 @@ func (a *App) RegisterRoutes() {
 		r.Delete("/flight_plans/{id}/{stepID}", a.DeleteFlightPlanStep)
 		r.Delete("/flight_plans/{id}", a.DeleteFlightPlan)
 
-		// r.Post("/webhook", a.WebhookHandler)
+		r.Post("/webhook", a.WebhookHandler)
 	})
 }

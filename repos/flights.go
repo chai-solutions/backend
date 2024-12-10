@@ -9,6 +9,7 @@ import (
 type FlightsRepository interface {
 	FlightByCode(flightCode string) (*sqlc.GetFlightRow, error)
 	FlightsByDepartureArrival(departureCode string, arrivalCode string) ([]sqlc.GetFlightsRow, error)
+	UsersOnFlight(flightNumber string) ([]sqlc.GetUsersByFlightNumberRow, error)
 }
 
 type flightsRepositoryImpl struct {
@@ -38,4 +39,13 @@ func (r *flightsRepositoryImpl) FlightsByDepartureArrival(departureCode string, 
 	}
 
 	return flights, nil
+}
+
+func (r *flightsRepositoryImpl) UsersOnFlight(flightNumber string) ([]sqlc.GetUsersByFlightNumberRow, error) {
+	users, err := r.db.GetUsersByFlightNumber(context.Background(), flightNumber)
+	if err != nil {
+		return nil, err
+	}
+
+	return users, nil
 }

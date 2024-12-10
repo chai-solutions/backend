@@ -55,10 +55,11 @@ type Gate struct {
 }
 
 type Notification struct {
-	ID           int32            `json:"id"`
-	EventType    string           `json:"event_type"`
-	FlightNumber string           `json:"flight_number"`
-	CreatedAt    pgtype.Timestamp `json:"created_at"`
+	ID        int32            `json:"id"`
+	Title     string           `json:"title"`
+	Message   string           `json:"message"`
+	CreatedAt pgtype.Timestamp `json:"created_at"`
+	User      int32            `json:"user"`
 }
 
 type Session struct {
