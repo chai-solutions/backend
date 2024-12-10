@@ -2,9 +2,11 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 )
 
 func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
@@ -21,8 +23,14 @@ func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	flights, err := a.FlightsRepo.FlightsByDepartureArrival(depAirport, arrAirport)
-	if err != nil {
+	if err != nil && err != pgx.ErrNoRows {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if len(flights) == 0 {
+		_, _ = w.Write([]byte("[]"))
+		return
 	}
 
 	err = json.NewEncoder(w).Encode(flights)
@@ -37,6 +45,10 @@ func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	flight, err := a.FlightsRepo.FlightByCode(flightCode)
+	if err == pgx.ErrNoRows {
+		http.Error(w, fmt.Sprintf(`no flight with number %s found`, flightCode), http.StatusNotFound)
+		return
+	}
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

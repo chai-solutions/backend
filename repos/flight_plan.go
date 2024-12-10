@@ -10,8 +10,10 @@ type FlightPlanRepository interface {
 	CreatePlan(userID int32, initialFlightNumber string) (*sqlc.FlightPlanFlight, error)
 	AddFlightToPlan(planID int32, flightNumber string) (*sqlc.FlightPlanFlight, error)
 	GetPlansForUser(userID int32) ([]sqlc.GetFlightPlansRow, error)
-	GetPlan(userID int32, planID int32) ([]sqlc.GetFlightPlanRow, error)
+	Exists(planID int32) (bool, error)
+	GetPlan(planID int32) ([]sqlc.GetFlightPlanRow, error)
 	DeletePlan(planID int32) error
+	StepCount(planID int32) (int64, error)
 	DeleteFlightFromPlan(stepID int32) error
 }
 
@@ -56,12 +58,8 @@ func (r *flightPlanRepositoryImpl) GetPlansForUser(userID int32) ([]sqlc.GetFlig
 	return plans, nil
 }
 
-func (r *flightPlanRepositoryImpl) GetPlan(userID int32, planID int32) ([]sqlc.GetFlightPlanRow, error) {
-	plan, err := r.db.GetFlightPlan(context.Background(), sqlc.GetFlightPlanParams{
-		// FIXME: This `Users` param is actually useless. Refactor the query later.
-		Users: userID,
-		ID:    planID,
-	})
+func (r *flightPlanRepositoryImpl) GetPlan(planID int32) ([]sqlc.GetFlightPlanRow, error) {
+	plan, err := r.db.GetFlightPlan(context.Background(), planID)
 	if err != nil {
 		return nil, err
 	}
@@ -77,4 +75,20 @@ func (r *flightPlanRepositoryImpl) DeletePlan(planID int32) error {
 func (r *flightPlanRepositoryImpl) DeleteFlightFromPlan(stepID int32) error {
 	err := r.db.DeleteFlightPlanStep(context.Background(), stepID)
 	return err
+}
+
+func (r *flightPlanRepositoryImpl) Exists(planID int32) (bool, error) {
+	exists, err := r.db.FlightPlanExists(context.Background(), planID)
+	if err != nil {
+		return false, err
+	}
+	return exists, err
+}
+
+func (r *flightPlanRepositoryImpl) StepCount(planID int32) (int64, error) {
+	count, err := r.db.GetFlightPlanStepCount(context.Background(), planID)
+	if err != nil {
+		return 0, err
+	}
+	return count, nil
 }

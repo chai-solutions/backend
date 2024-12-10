@@ -69,8 +69,7 @@ FROM
     JOIN airports AS departure_airport ON f.dep_airport = departure_airport.id
     JOIN airports AS arrival_airport ON f.arr_airport = arrival_airport.id
 WHERE
-    fp.users = @users
-    AND fp.id = @id;
+    fp.id = @id;
 
 -- name: DeleteFlightPlan :exec
 DELETE FROM
@@ -91,9 +90,21 @@ SELECT
     u.public_id,
     u.id AS user_id
 FROM
-    USERS AS u
+    users AS u
     JOIN flight_plans AS fp ON fp.users = u.id
     JOIN flight_plan_flights AS fpf ON fpf.flight_plan = fp.id
     JOIN flights AS f ON f.id = fpf.flight
 WHERE
     f.flight_number = @flight_number;
+
+-- name: GetFlightPlanStepCount :one
+SELECT
+    COUNT(*)
+FROM
+    flight_plan_flights AS fpf
+WHERE
+    fpf.flight_plan = @id;
+
+-- name: FlightPlanExists :one
+SELECT COUNT(*) > 0 from flight_plans
+WHERE flight_plans.id = @id;
