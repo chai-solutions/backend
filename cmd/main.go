@@ -6,6 +6,7 @@ import (
 
 	"chai/config"
 	"chai/database"
+	"chai/repos"
 	"chai/server"
 
 	"github.com/rs/zerolog"
@@ -34,10 +35,24 @@ func main() {
 
 	log.Info().Str("env", cfg.Env).Send()
 
-	db, queries := database.NewPool(cfg.DatabaseURL)
+	_, queries := database.NewPool(cfg.DatabaseURL)
+
+	userRepo := repos.NewUserRepository(queries)
+	sessionRepo := repos.NewSessionRepository(queries)
+	airportsRepo := repos.NewAirportsRepository(queries)
+	flightsRepo := repos.NewFlightsRepository(queries)
+	flightPlanRepo := repos.NewFlightPlanRepository(queries)
+	notificationsRepo := repos.NewNotificationsRepo(queries)
 
 	database.RunMigrations(cfg.DatabaseURL)
-	server := server.NewApp(cfg, db, queries)
+	server := server.NewApp(cfg, server.Repositories{
+		UserRepo:          userRepo,
+		SessionRepo:       sessionRepo,
+		AirportsRepo:      airportsRepo,
+		FlightsRepo:       flightsRepo,
+		FlightPlanRepo:    flightPlanRepo,
+		NotificationsRepo: notificationsRepo,
+	})
 	server.RegisterRoutes()
 
 	server.Start()

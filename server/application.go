@@ -10,22 +10,35 @@ import (
 	"time"
 
 	"chai/config"
-	"chai/database/sqlc"
+	"chai/repos"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog/log"
 )
 
 type App struct {
-	Config  config.AppConfig
-	DB      *pgxpool.Pool
-	Router  *chi.Mux
-	Server  *http.Server
-	Queries *sqlc.Queries
+	Config config.AppConfig
+	Router *chi.Mux
+	Server *http.Server
+
+	UserRepo          repos.UserRepository
+	SessionRepo       repos.SessionRepository
+	AirportsRepo      repos.AirportsRepository
+	FlightsRepo       repos.FlightsRepository
+	FlightPlanRepo    repos.FlightPlanRepository
+	NotificationsRepo repos.NotificationsRepo
 }
 
-func NewApp(cfg config.AppConfig, db *pgxpool.Pool, queries *sqlc.Queries) *App {
+type Repositories struct {
+	UserRepo          repos.UserRepository
+	SessionRepo       repos.SessionRepository
+	AirportsRepo      repos.AirportsRepository
+	FlightsRepo       repos.FlightsRepository
+	FlightPlanRepo    repos.FlightPlanRepository
+	NotificationsRepo repos.NotificationsRepo
+}
+
+func NewApp(cfg config.AppConfig, repos Repositories) *App {
 	mux := chi.NewMux()
 
 	addr := fmt.Sprintf(":%d", cfg.Port)
@@ -39,11 +52,16 @@ func NewApp(cfg config.AppConfig, db *pgxpool.Pool, queries *sqlc.Queries) *App 
 	}
 
 	return &App{
-		Config:  cfg,
-		DB:      db,
-		Router:  mux,
-		Server:  &s,
-		Queries: queries,
+		Config: cfg,
+		Router: mux,
+		Server: &s,
+
+		UserRepo:          repos.UserRepo,
+		SessionRepo:       repos.SessionRepo,
+		AirportsRepo:      repos.AirportsRepo,
+		FlightsRepo:       repos.FlightsRepo,
+		FlightPlanRepo:    repos.FlightPlanRepo,
+		NotificationsRepo: repos.NotificationsRepo,
 	}
 }
 

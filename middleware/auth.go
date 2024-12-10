@@ -6,19 +6,20 @@ import (
 	"strings"
 
 	"chai/database/sqlc"
+	"chai/repos"
 
 	"github.com/rs/zerolog/log"
 )
 
-func MustGetUserFromContext(ctx context.Context) sqlc.GetUserFromSessionContextRow {
-	user, ok := ctx.Value(userCtxKey).(sqlc.GetUserFromSessionContextRow)
+func MustGetUserFromContext(ctx context.Context) *sqlc.GetUserFromSessionContextRow {
+	user, ok := ctx.Value(userCtxKey).(*sqlc.GetUserFromSessionContextRow)
 	if !ok {
 		panic("user not present in context")
 	}
 	return user
 }
 
-func APIAuthorization(q *sqlc.Queries) func(http.Handler) http.Handler {
+func APIAuthorization(repo repos.SessionRepository) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
@@ -36,18 +37,17 @@ func APIAuthorization(q *sqlc.Queries) func(http.Handler) http.Handler {
 			}
 			token := parts[1]
 
-			users, err := q.GetUserFromSessionContext(context.Background(), token)
+			user, err := repo.GetUserFromSessionContext(token)
 			if err != nil {
 				log.Warn().Err(err).Send()
 				http.Error(w, "unable to retrieve session", http.StatusInternalServerError)
 				return
 			}
 
-			if len(users) == 0 {
+			if user == nil {
 				http.Error(w, "access denied", http.StatusForbidden)
 				return
 			}
-			user := users[0]
 
 			ctx := context.WithValue(r.Context(), userCtxKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))

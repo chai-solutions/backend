@@ -1,8 +1,6 @@
 package server
 
 import (
-	"chai/database/sqlc"
-	"context"
 	"encoding/json"
 	"net/http"
 
@@ -22,12 +20,7 @@ func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	params := sqlc.GetFlightsParams{
-		Arr: arrAirport,
-		Dep: depAirport,
-	}
-
-	flights, err := a.Queries.GetFlights(context.Background(), params)
+	flights, err := a.FlightsRepo.FlightsByDepartureArrival(depAirport, arrAirport)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -37,20 +30,19 @@ func (a *App) FlightsHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *App) FlightHandler(w http.ResponseWriter, r *http.Request) {
-	flightNumber := chi.URLParam(r, "flightNumber")
-	if flightNumber == "" {
+	flightCode := chi.URLParam(r, "flightNumber")
+	if flightCode == "" {
 		http.Error(w, "Invalid Flight Number", http.StatusBadRequest)
 		return
 	}
 
-	flight, err := a.Queries.GetFlight(context.Background(), flightNumber)
+	flight, err := a.FlightsRepo.FlightByCode(flightCode)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(
-		flight)
+	err = json.NewEncoder(w).Encode(flight)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

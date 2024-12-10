@@ -5,24 +5,8 @@
 
 package sqlc
 
-import (
-	"context"
-)
-
-const createNotification = `-- name: CreateNotification :one
-INSERT INTO notifications (event_type, flight_number)
-VALUES ($1, $2)
-RETURNING id
-`
-
-type CreateNotificationParams struct {
-	EventType    string `json:"event_type"`
-	FlightNumber string `json:"flight_number"`
-}
-
-func (q *Queries) CreateNotification(ctx context.Context, arg CreateNotificationParams) (int32, error) {
-	row := q.db.QueryRow(ctx, createNotification, arg.EventType, arg.FlightNumber)
-	var id int32
-	err := row.Scan(&id)
-	return id, err
+type CreateNotificationsParams struct {
+	User    int32  `json:"user"`
+	Title   string `json:"title"`
+	Message string `json:"message"`
 }

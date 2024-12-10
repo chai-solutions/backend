@@ -88,7 +88,8 @@ WHERE
 SELECT
     f.flight_number,
     f.status,
-    u.public_id
+    u.public_id,
+    u.id AS user_id
 FROM
     USERS AS u
     JOIN flight_plans AS fp ON fp.users = u.id

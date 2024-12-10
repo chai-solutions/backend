@@ -1,24 +1,20 @@
 package server
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
 
-	"chai/database/sqlc"
 	"chai/middleware"
-
-	"golang.org/x/crypto/bcrypt"
 )
 
-type createUserBody struct {
+type CreateUserBody struct {
 	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
 
 func (a *App) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
-	var body createUserBody
+	var body CreateUserBody
 
 	err := json.NewDecoder(r.Body).Decode(&body)
 	if err != nil {
@@ -39,23 +35,10 @@ func (a *App) CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	passwordHash, err := bcrypt.GenerateFromPassword([]byte(body.Password), 14)
-	if err != nil {
-		http.Error(w, "password hash error: "+err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	createdUser, err := a.Queries.CreateAccount(context.Background(), sqlc.CreateAccountParams{
-		Name:         body.Name,
-		Email:        body.Email,
-		PasswordHash: string(passwordHash),
-	})
+	err = a.UserRepo.CreateUser(body.Name, body.Email, body.Password)
 	if err != nil {
 		http.Error(w, "error creating account: "+err.Error(), http.StatusInternalServerError)
 	}
-
-	err = json.NewEncoder(w).Encode(createdUser)
-	_ = err
 }
 
 func (a *App) UserInfoHandler(w http.ResponseWriter, r *http.Request) {

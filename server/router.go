@@ -20,7 +20,7 @@ func (a *App) RegisterRoutes() {
 	r.Post("/login", a.LoginHandler)
 
 	r.Group(func(r chi.Router) {
-		r.Use(middleware.APIAuthorization(a.Queries))
+		r.Use(middleware.APIAuthorization(a.SessionRepo))
 
 		r.Get("/users/@me", a.UserInfoHandler)
 		r.Delete("/logout", a.LogoutHandler)
@@ -36,8 +36,6 @@ func (a *App) RegisterRoutes() {
 		r.Get("/flight_plans/{id}", a.GetFlightPlanHandler)
 		r.Delete("/flight_plans/{id}/{stepID}", a.DeleteFlightPlanStep)
 		r.Delete("/flight_plans/{id}", a.DeleteFlightPlan)
-
-		r.Get("/maps/{iata}", a.AirportMapHandler)
 
 		r.Post("/webhook", a.WebhookHandler)
 	})

@@ -1,12 +1,11 @@
 package server
 
 import (
-	"chai/database/sqlc"
-	"chai/middleware"
-	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
+
+	"chai/middleware"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/rs/zerolog/log"
@@ -24,18 +23,14 @@ func (a *App) PatchFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "malformed JSON", http.StatusBadRequest)
 		return
 	}
+
 	planID, err := strconv.Atoi(chi.URLParam(r, "id"))
 	if err != nil {
 		http.Error(w, "Invalid Flight ID", http.StatusBadRequest)
 		return
 	}
 
-	params := sqlc.PatchFlightPlanParams{
-		FlightNumber: body.FlightNumber,
-		FlightPlan:   int32(planID),
-	}
-
-	flightPlan, err := a.Queries.PatchFlightPlan(context.Background(), params)
+	flightPlan, err := a.FlightPlanRepo.AddFlightToPlan(int32(planID), body.FlightNumber)
 	if err != nil {
 		http.Error(w, "failed to insert flight plan flight", http.StatusInternalServerError)
 		log.Error().Err(err).Msg("failed to patch flight plan")
@@ -58,12 +53,7 @@ func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	user := middleware.MustGetUserFromContext(r.Context())
 
-	params := sqlc.CreateFlightPlanParams{
-		Users:        user.ID,
-		Flightnumber: body.FlightNumber,
-	}
-
-	flightPlan, err := a.Queries.CreateFlightPlan(context.Background(), params)
+	flightPlan, err := a.FlightPlanRepo.CreatePlan(user.ID, body.FlightNumber)
 	if err != nil {
 		log.Error().AnErr("CreateFlightPlan", err).Msg("Failed to create flight plan")
 		http.Error(w, "Failed to create flight plan", http.StatusInternalServerError)
@@ -79,7 +69,7 @@ func (a *App) CreateFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 func (a *App) GetFlightPlansHandler(w http.ResponseWriter, r *http.Request) {
 	user := middleware.MustGetUserFromContext(r.Context())
 
-	flightPlans, err := a.Queries.GetFlightPlans(context.Background(), user.ID)
+	flightPlans, err := a.FlightPlanRepo.GetPlansForUser(user.ID)
 	if err != nil {
 		log.Error().AnErr("GetFlightPlan", err).Msg("Failed to get flight plans")
 		http.Error(w, "Failed to get flight plans", http.StatusInternalServerError)
@@ -100,12 +90,8 @@ func (a *App) GetFlightPlanHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	flightPlanID := int32(param)
-	params := sqlc.GetFlightPlanParams{
-		Users: user.ID,
-		ID:    flightPlanID,
-	}
 
-	flightPlans, err := a.Queries.GetFlightPlan(context.Background(), params)
+	flightPlans, err := a.FlightPlanRepo.GetPlan(user.ID, flightPlanID)
 	if err != nil {
 		log.Error().AnErr("GetFlightPlan", err).Msg("Failed to get flight plans")
 		http.Error(w, "Failed to get flight plans", http.StatusInternalServerError)
@@ -124,7 +110,7 @@ func (a *App) DeleteFlightPlan(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = a.Queries.DeleteFlightPlan(context.Background(), int32(planID))
+	err = a.FlightPlanRepo.DeletePlan(int32(planID))
 	if err != nil {
 		log.Error().AnErr("DeleteFlightPlan", err).Msg("Failed to delete flight plan")
 		http.Error(w, "Failed to delete flight plan", http.StatusInternalServerError)
@@ -141,9 +127,9 @@ func (a *App) DeleteFlightPlanStep(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = a.Queries.DeleteFlightPlanStep(context.Background(), int32(stepID))
+	err = a.FlightPlanRepo.DeleteFlightFromPlan(int32(stepID))
+	log.Error().AnErr("DeleteFlightPlanStep", err).Msg("Failed to delete flight plan step")
 	if err != nil {
-		log.Error().AnErr("DeleteFlightPlanStep", err).Msg("Failed to delete flight plan step")
 		http.Error(w, "Failed to delete flight plan step", http.StatusInternalServerError)
 		return
 	}
