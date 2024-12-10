@@ -43,7 +43,7 @@ func (r *userRepositoryImpl) GetUserByEmail(email string) (*sqlc.User, error) {
 		return nil, err
 	}
 
-	if len(users) != 0 {
+	if len(users) == 0 {
 		return nil, nil
 	}
 

@@ -21,17 +21,19 @@ type App struct {
 	Router *chi.Mux
 	Server *http.Server
 
-	UserRepo     repos.UserRepository
-	SessionRepo  repos.SessionRepository
-	AirportsRepo repos.AirportsRepository
-	FlightsRepo  repos.FlightsRepository
+	UserRepo       repos.UserRepository
+	SessionRepo    repos.SessionRepository
+	AirportsRepo   repos.AirportsRepository
+	FlightsRepo    repos.FlightsRepository
+	FlightPlanRepo repos.FlightPlanRepository
 }
 
 type Repositories struct {
-	UserRepo     repos.UserRepository
-	SessionRepo  repos.SessionRepository
-	AirportsRepo repos.AirportsRepository
-	FlightsRepo  repos.FlightsRepository
+	UserRepo       repos.UserRepository
+	SessionRepo    repos.SessionRepository
+	AirportsRepo   repos.AirportsRepository
+	FlightsRepo    repos.FlightsRepository
+	FlightPlanRepo repos.FlightPlanRepository
 }
 
 func NewApp(cfg config.AppConfig, repos Repositories) *App {
@@ -52,10 +54,11 @@ func NewApp(cfg config.AppConfig, repos Repositories) *App {
 		Router: mux,
 		Server: &s,
 
-		UserRepo:     repos.UserRepo,
-		SessionRepo:  repos.SessionRepo,
-		AirportsRepo: repos.AirportsRepo,
-		FlightsRepo:  repos.FlightsRepo,
+		UserRepo:       repos.UserRepo,
+		SessionRepo:    repos.SessionRepo,
+		AirportsRepo:   repos.AirportsRepo,
+		FlightsRepo:    repos.FlightsRepo,
+		FlightPlanRepo: repos.FlightPlanRepo,
 	}
 }
 
