@@ -66,6 +66,18 @@ func (q *Queries) DeleteFlightPlanStep(ctx context.Context, id int32) error {
 	return err
 }
 
+const flightPlanExists = `-- name: FlightPlanExists :one
+SELECT COUNT(*) > 0 from flight_plans
+WHERE flight_plans.id = $1
+`
+
+func (q *Queries) FlightPlanExists(ctx context.Context, id int32) (bool, error) {
+	row := q.db.QueryRow(ctx, flightPlanExists, id)
+	var column_1 bool
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const getFlightPlan = `-- name: GetFlightPlan :many
 SELECT
     fpf.id,
@@ -85,14 +97,8 @@ FROM
     JOIN airports AS departure_airport ON f.dep_airport = departure_airport.id
     JOIN airports AS arrival_airport ON f.arr_airport = arrival_airport.id
 WHERE
-    fp.users = $1
-    AND fp.id = $2
+    fp.id = $1
 `
-
-type GetFlightPlanParams struct {
-	Users int32 `json:"users"`
-	ID    int32 `json:"id"`
-}
 
 type GetFlightPlanRow struct {
 	ID             int32            `json:"id"`
@@ -107,8 +113,8 @@ type GetFlightPlanRow struct {
 	ActualArrTime  pgtype.Timestamp `json:"actual_arr_time"`
 }
 
-func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) ([]GetFlightPlanRow, error) {
-	rows, err := q.db.Query(ctx, getFlightPlan, arg.Users, arg.ID)
+func (q *Queries) GetFlightPlan(ctx context.Context, id int32) ([]GetFlightPlanRow, error) {
+	rows, err := q.db.Query(ctx, getFlightPlan, id)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +142,22 @@ func (q *Queries) GetFlightPlan(ctx context.Context, arg GetFlightPlanParams) ([
 		return nil, err
 	}
 	return items, nil
+}
+
+const getFlightPlanStepCount = `-- name: GetFlightPlanStepCount :one
+SELECT
+    COUNT(*)
+FROM
+    flight_plan_flights AS fpf
+WHERE
+    fpf.flight_plan = $1
+`
+
+func (q *Queries) GetFlightPlanStepCount(ctx context.Context, id int32) (int64, error) {
+	row := q.db.QueryRow(ctx, getFlightPlanStepCount, id)
+	var count int64
+	err := row.Scan(&count)
+	return count, err
 }
 
 const getFlightPlans = `-- name: GetFlightPlans :many
@@ -214,7 +236,7 @@ SELECT
     u.public_id,
     u.id AS user_id
 FROM
-    USERS AS u
+    users AS u
     JOIN flight_plans AS fp ON fp.users = u.id
     JOIN flight_plan_flights AS fpf ON fpf.flight_plan = fp.id
     JOIN flights AS f ON f.id = fpf.flight
