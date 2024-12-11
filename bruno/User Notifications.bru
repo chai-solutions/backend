@@ -5,7 +5,11 @@ meta {
 }
 
 get {
-  url: 
+  url: {{url}}/notifications
   body: none
   auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
 }

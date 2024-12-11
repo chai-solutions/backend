@@ -19,6 +19,11 @@ func (a *App) NotificationHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if len(notifications) == 0 {
+		_, _ = w.Write([]byte("[]"))
+		return
+	}
+
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(notifications); err != nil {
 		http.Error(w, "Failed to encode response", http.StatusInternalServerError)
