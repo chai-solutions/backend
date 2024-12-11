@@ -5,8 +5,43 @@
 
 package sqlc
 
+import (
+	"context"
+)
+
 type CreateNotificationsParams struct {
 	User    int32  `json:"user"`
 	Title   string `json:"title"`
 	Message string `json:"message"`
+}
+
+const getUsersNotifications = `-- name: GetUsersNotifications :many
+SELECT id, title, message, created_at, "user" FROM notifications
+WHERE "user" = $1
+`
+
+func (q *Queries) GetUsersNotifications(ctx context.Context, user int32) ([]Notification, error) {
+	rows, err := q.db.Query(ctx, getUsersNotifications, user)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var items []Notification
+	for rows.Next() {
+		var i Notification
+		if err := rows.Scan(
+			&i.ID,
+			&i.Title,
+			&i.Message,
+			&i.CreatedAt,
+			&i.User,
+		); err != nil {
+			return nil, err
+		}
+		items = append(items, i)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return items, nil
 }

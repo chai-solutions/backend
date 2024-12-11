@@ -1,0 +1,15 @@
+meta {
+  name: User Notifications
+  type: http
+  seq: 18
+}
+
+get {
+  url: {{url}}/notifications
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{token}}
+}
