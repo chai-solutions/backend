@@ -8,10 +8,17 @@ import (
 
 type NotificationsRepo interface {
 	CreateNotifications(userIDs []int32, title string, message string) error
+	GetUserNotifications(userID int32) ([]sqlc.Notification, error)
 }
 
 type notificationsRepoImpl struct {
 	db *sqlc.Queries
+}
+
+// GetUserNotifications implements NotificationsRepo.
+func (r *notificationsRepoImpl) GetUserNotifications(userID int32) ([]sqlc.Notification, error) {
+	notifications, err := r.db.GetUsersNotifications(context.Background(), userID)
+	return notifications, err
 }
 
 func NewNotificationsRepo(db *sqlc.Queries) NotificationsRepo {

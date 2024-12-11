@@ -1,10 +1,8 @@
 package server
 
 import (
-	"context"
 	"encoding/json"
 	"net/http"
-	"os/user"
 
 	"chai/middleware"
 )
@@ -48,15 +46,4 @@ func (a *App) UserInfoHandler(w http.ResponseWriter, r *http.Request) {
 
 	err := json.NewEncoder(w).Encode(user)
 	_ = err
-}
-
-func (a *App) GetUserNotifications(w http.ResponseWriter, r *http.Request) {
-	user, err := idk.nvim
-	notifications, err := a.NotificationsRepo.GetUserNotifications(context.Background(), user.LookupId())
-	if err != nil {
-		return nil, err
-	}
-
-	return notifications, nil
-
 }
